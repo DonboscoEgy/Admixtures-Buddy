@@ -531,11 +531,24 @@ function OpportunityModal({ onClose, onSuccess, profile, initialData }) {
                         <input type="date" name="closing_date" className="form-input" value={formData.closing_date} onChange={handleChange} required />
                     </div>
 
-                    <div className="modal-actions">
-                        <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
-                        <button type="submit" className="btn-primary" disabled={loading}>
-                            {loading ? 'Saving...' : (initialData ? 'Update Opportunity' : 'Create Opportunity')}
-                        </button>
+                    <div className="modal-actions" style={{ justifyContent: 'space-between' }}>
+                        {initialData && (
+                            <button
+                                type="button"
+                                onClick={handleConvertToAccount}
+                                className="btn-secondary"
+                                style={{ color: '#10b981', borderColor: '#10b981' }}
+                                title="Create Account & Mark Won"
+                            >
+                                <Package size={16} style={{ marginRight: '5px' }} /> Convert to Account
+                            </button>
+                        )}
+                        <div style={{ display: 'flex', gap: '10px', marginLeft: 'auto' }}>
+                            <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
+                            <button type="submit" className="btn-primary" disabled={loading}>
+                                {loading ? 'Saving...' : (initialData ? 'Update Opportunity' : 'Create Opportunity')}
+                            </button>
+                        </div>
                     </div>
 
                 </form>

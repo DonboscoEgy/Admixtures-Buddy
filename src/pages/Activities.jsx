@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
-import { Calendar, Plus, Save, Trash2, User, Building2, Phone, Users, MapPin } from 'lucide-react';
+import { Calendar, Plus, Save, Trash2, User, Building2, Phone, Users, MapPin, Briefcase } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 
 export default function Activities({ embeddedAccount = null }) {
@@ -13,29 +13,36 @@ export default function Activities({ embeddedAccount = null }) {
 
     // Form State
     const [isFormOpen, setIsFormOpen] = useState(false);
+
+    // We store the generic "target" ID here, and figure out the type on save
+    const [selectedTargetId, setSelectedTargetId] = useState('');
+
     const [newActivity, setNewActivity] = useState({
-        account_id: embeddedAccount?.id || '',
         activity_type: 'Visit', // Default
         activity_date: new Date().toISOString().split('T')[0], // Default Today
         outcome: ''
     });
 
-    // Master Data for Dropdown (Only needed if Global Mode)
+    // Master Data
     const [accounts, setAccounts] = useState([]);
+    const [opportunities, setOpportunities] = useState([]);
 
     useEffect(() => {
         fetchActivities();
         if (!embeddedAccount) {
-            fetchAccounts();
+            fetchTargets();
         } else {
-            // If embedded, ensure account_id is set
-            setNewActivity(prev => ({ ...prev, account_id: embeddedAccount.id }));
+            // If embedded, pre-select
+            setSelectedTargetId(`ACC_${embeddedAccount.id}`);
         }
     }, [embeddedAccount]);
 
-    const fetchAccounts = async () => {
-        const { data } = await supabase.from('accounts_master').select('id, name').order('name');
-        setAccounts(data || []);
+    const fetchTargets = async () => {
+        const { data: accs } = await supabase.from('accounts_master').select('id, name').order('name');
+        const { data: opps } = await supabase.from('opportunities').select('id, account_name, stage').neq('stage', 'Won').neq('stage', 'Lost');
+
+        setAccounts(accs || []);
+        setOpportunities(opps || []);
     };
 
     const fetchActivities = async () => {
@@ -44,7 +51,8 @@ export default function Activities({ embeddedAccount = null }) {
             .from('mac_account_activities')
             .select(`
                 *,
-                accounts_master (name)
+                accounts_master (name),
+                opportunities (account_name)
             `)
             .order('activity_date', { ascending: false })
             .order('created_at', { ascending: false });
@@ -65,16 +73,31 @@ export default function Activities({ embeddedAccount = null }) {
     const handleSave = async (e) => {
         e.preventDefault();
 
-        if (!newActivity.account_id) {
-            showToast('Please select an account', 'error');
-            return;
+        // Decide ID based on prefix
+        let payload = {
+            ...newActivity,
+            created_by: profile?.initials || user?.email
+        };
+
+        if (embeddedAccount) {
+            payload.account_id = embeddedAccount.id;
+        } else {
+            if (!selectedTargetId) {
+                showToast('Please select a target', 'error');
+                return;
+            }
+
+            if (selectedTargetId.startsWith('ACC_')) {
+                payload.account_id = selectedTargetId.replace('ACC_', '');
+                payload.opportunity_id = null; // explicit null
+            } else if (selectedTargetId.startsWith('OPP_')) {
+                payload.opportunity_id = selectedTargetId.replace('OPP_', '');
+                payload.account_id = null; // explicit null
+            }
         }
 
         try {
-            const { error } = await supabase.from('mac_account_activities').insert([{
-                ...newActivity,
-                created_by: profile?.initials || user?.email
-            }]);
+            const { error } = await supabase.from('mac_account_activities').insert([payload]);
 
             if (error) throw error;
 
@@ -85,7 +108,10 @@ export default function Activities({ embeddedAccount = null }) {
                 outcome: '',
                 activity_type: 'Visit',
                 activity_date: new Date().toISOString().split('T')[0]
-            })); // Reset form but keep account if embedded
+            }));
+
+            // Keep selection if not embedded mode, user might add another
+            if (!embeddedAccount) setSelectedTargetId('');
 
             fetchActivities();
 
@@ -110,6 +136,12 @@ export default function Activities({ embeddedAccount = null }) {
             case 'Visit': return <MapPin size={16} color="#f59e0b" />;
             default: return <Calendar size={16} />;
         }
+    };
+
+    const getDisplayName = (act) => {
+        if (act.accounts_master?.name) return act.accounts_master.name;
+        if (act.opportunities?.account_name) return `${act.opportunities.account_name} (Pipeline)`;
+        return 'Unknown';
     };
 
     return (
@@ -149,18 +181,29 @@ export default function Activities({ embeddedAccount = null }) {
                     <form onSubmit={handleSave}>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '15px' }}>
 
-                            {/* Account Select (Hidden if embedded) */}
+                            {/* Target Select (Hidden if embedded) */}
                             {!embeddedAccount && (
                                 <div>
-                                    <label className="form-label">Account</label>
+                                    <label className="form-label">Client / Prospect</label>
                                     <select
                                         className="form-input"
-                                        value={newActivity.account_id}
-                                        onChange={e => setNewActivity({ ...newActivity, account_id: e.target.value })}
+                                        value={selectedTargetId}
+                                        onChange={e => setSelectedTargetId(e.target.value)}
                                         required
                                     >
-                                        <option value="">Select Account...</option>
-                                        {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                                        <option value="">Select Target...</option>
+
+                                        <optgroup label="Existing Accounts">
+                                            {accounts.map(a => (
+                                                <option key={`ACC_${a.id}`} value={`ACC_${a.id}`}>{a.name}</option>
+                                            ))}
+                                        </optgroup>
+
+                                        <optgroup label="Pipeline Opportunities">
+                                            {opportunities.map(o => (
+                                                <option key={`OPP_${o.id}`} value={`OPP_${o.id}`}>{o.account_name} ({o.stage})</option>
+                                            ))}
+                                        </optgroup>
                                     </select>
                                 </div>
                             )}
@@ -242,7 +285,12 @@ export default function Activities({ embeddedAccount = null }) {
                                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                                         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                                             {!embeddedAccount && (
-                                                <span style={{ fontWeight: 'bold', color: '#60a5fa' }}>{act.accounts_master?.name}</span>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                                    {act.opportunity_id ? <Briefcase size={14} color="#f472b6" /> : <Building2 size={14} color="#60a5fa" />}
+                                                    <span style={{ fontWeight: 'bold', color: act.opportunity_id ? '#f472b6' : '#60a5fa' }}>
+                                                        {getDisplayName(act)}
+                                                    </span>
+                                                </div>
                                             )}
                                             <span style={{
                                                 display: 'flex', alignItems: 'center', gap: '5px',

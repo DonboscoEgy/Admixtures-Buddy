@@ -5,13 +5,16 @@ import { useAuth } from '../context/AuthContext';
 
 export default function QuickOrder() {
     const { profile } = useAuth();
-    const [formData, setFormData] = useState({
-        date: new Date().toISOString().split('T')[0],
-        account: '',
-        product: '',
-        qty: '',
-        price: ''
-    });
+
+    // Header State
+    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [account, setAccount] = useState('');
+
+    // Items State
+    const [items, setItems] = useState([
+        { id: Date.now(), product: '', qty: '', price: '' }
+    ]);
+
     const [status, setStatus] = useState({ type: '', message: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -22,12 +25,9 @@ export default function QuickOrder() {
     // Load Master Data
     useEffect(() => {
         const loadMasters = async () => {
-
             try {
-                const { data: accs, error: accError } = await supabase.from('accounts_master').select('*');
-                const { data: prods, error: prodError } = await supabase.from('products_master').select('*');
-
-
+                const { data: accs } = await supabase.from('accounts_master').select('*').order('name');
+                const { data: prods } = await supabase.from('products_master').select('*').order('name');
 
                 setMasterData({
                     accounts: accs || [],
@@ -43,49 +43,69 @@ export default function QuickOrder() {
         loadMasters();
     }, []);
 
-    // Auto-Pricing Logic
-    useEffect(() => {
-        const fetchPrice = async () => {
-            if (formData.account && formData.product) {
-                // Check Client Pricing first
-                const { data: clientPrice } = await supabase
-                    .from('client_pricing')
-                    .select('agreed_price')
-                    .eq('account_name', formData.account)
-                    .eq('product_name', formData.product)
-                    .single();
+    // Helper: Fetch Price for a specific row
+    const fetchPriceForRow = async (productName, index) => {
+        if (!account || !productName) return;
 
-                if (clientPrice) {
-                    setFormData(prev => ({ ...prev, price: clientPrice.agreed_price }));
-                    return;
-                }
+        // Check Client Pricing first
+        const { data: clientPrice } = await supabase
+            .from('client_pricing')
+            .select('agreed_price')
+            .eq('account_name', account)
+            .eq('product_name', productName)
+            .single();
 
-                // Fallback to Product Default
-                const { data: prodDef } = await supabase
-                    .from('products_master')
-                    .select('default_price')
-                    .eq('name', formData.product)
-                    .single();
+        let finalPrice = 0;
 
-                if (prodDef) {
-                    setFormData(prev => ({ ...prev, price: prodDef.default_price || 0 }));
-                } else {
-                    setFormData(prev => ({ ...prev, price: 0 }));
-                }
-            }
-        };
-
-        // Debounce slightly or just run
-        // For simplicity in React 18 strict mode handled by useEffect usually fine, 
-        // but let's check inputs are valid strings
-        if (formData.account && formData.product) {
-            fetchPrice();
+        if (clientPrice) {
+            finalPrice = clientPrice.agreed_price;
+        } else {
+            // Fallback to Product Default
+            const { data: prodDef } = await supabase
+                .from('products_master')
+                .select('default_price')
+                .eq('name', productName)
+                .single();
+            finalPrice = prodDef?.default_price || 0;
         }
-    }, [formData.account, formData.product]);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        updateItem(index, 'price', finalPrice);
+    };
+
+    // Handlers
+    const handleHeaderChange = (e) => {
+        setAccount(e.target.value);
+        // If account changes, maybe re-fetch prices? 
+        // For now, let's keep it simple. If they change account, they might need to re-select products to get new prices, 
+        // or we could trigger a re-calc. 
+        // Let's settle for: changing account clears prices or re-fetches for all.
+        // For Quick Order, usually User selects Account FIRST.
+        if (e.target.name === 'account') {
+            // Optional: reset items or re-price. Let's leave as is for speed.
+        }
+    };
+
+    const addItem = () => {
+        setItems(prev => [...prev, { id: Date.now(), product: '', qty: '', price: '' }]);
+    };
+
+    const removeItem = (index) => {
+        if (items.length > 1) {
+            setItems(prev => prev.filter((_, i) => i !== index));
+        }
+    };
+
+    const updateItem = (index, field, value) => {
+        setItems(prev => {
+            const newItems = [...prev];
+            newItems[index] = { ...newItems[index], [field]: value };
+            return newItems;
+        });
+
+        // Trigger Price Fetch if Product changes
+        if (field === 'product') {
+            fetchPriceForRow(value, index);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -93,36 +113,46 @@ export default function QuickOrder() {
         setIsSubmitting(true);
         setStatus({ type: '', message: '' });
 
+        if (!account) {
+            setStatus({ type: 'error', message: 'Please select an account.' });
+            setIsSubmitting(false);
+            return;
+        }
+
+        // Validate items
+        const validItems = items.filter(i => i.product && i.qty);
+        if (validItems.length === 0) {
+            setStatus({ type: 'error', message: 'Please add at least one valid product.' });
+            setIsSubmitting(false);
+            return;
+        }
+
         try {
-            const { error } = await supabase.from('orders').insert([
-                {
-                    transaction_date: formData.date,
-                    account_name: formData.account,
-                    product_name: formData.product,
-                    quantity: parseFloat(formData.qty),
-                    unit_price: parseFloat(formData.price),
-                    // Defaults
-                    unit_cogs: 0,
-                    credit_days: 90,
-                    notes: 'Quick Order',
-                    sales_rep: profile?.initials || 'MH' // Auto-tag with initials OR default logic
-                }
-            ]);
+            const ordersToInsert = validItems.map(item => ({
+                transaction_date: date,
+                account_name: account,
+                product_name: item.product,
+                quantity: parseFloat(item.qty),
+                unit_price: parseFloat(item.price),
+                unit_cogs: 0,
+                credit_days: 90,
+                notes: 'Quick Order',
+                sales_rep: profile?.initials || 'MH'
+            }));
+
+            const { error } = await supabase.from('orders').insert(ordersToInsert);
 
             if (error) throw error;
 
-            setStatus({ type: 'success', message: 'Order added successfully!' });
+            setStatus({ type: 'success', message: `Successfully added ${validItems.length} orders!` });
 
-            // Reset only order fields, keep date
-            setFormData(prev => ({
-                ...prev,
-                // keep date and account (often users add multiple for same account)
-                product: '',
-                qty: '',
-                price: ''
-            }));
+            // Reset items but keep header info for speed entry? 
+            // Usually Quick Order implies next order might be different account.
+            // Let's keep Date, clear Account, reset Items.
+            setAccount('');
+            setItems([{ id: Date.now(), product: '', qty: '', price: '' }]);
 
-            // Auto hide success after 3s
+            // Auto hide success
             setTimeout(() => setStatus({ type: '', message: '' }), 3000);
 
         } catch (error) {
@@ -136,21 +166,22 @@ export default function QuickOrder() {
     if (loadingData) return <div style={{ padding: 50, textAlign: 'center' }}><Loader2 className="animate-spin" /> Loading masters...</div>;
 
     return (
-        <div style={{ maxWidth: '600px', margin: '0 auto', animation: 'fadeIn 0.5s ease-out' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', animation: 'fadeIn 0.5s ease-out' }}>
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                 <h1 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '2rem', marginBottom: '0.5rem' }}>
                     <Zap size={32} fill="#eab308" color="#eab308" />
                     Quick Order
                 </h1>
-                <p style={{ color: 'var(--color-text-muted)' }}>Fast track data entry for simple sales.</p>
+                <p style={{ color: 'var(--text-muted)' }}>Multi-product fast entry.</p>
 
                 {status.message && (
                     <div style={{
                         marginTop: '1rem',
                         padding: '0.75rem',
                         borderRadius: '0.5rem',
-                        background: status.type === 'success' ? '#dcfce7' : '#fee2e2',
-                        color: status.type === 'success' ? '#166534' : '#991b1b',
+                        background: status.type === 'success' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                        color: status.type === 'success' ? '#34d399' : '#f87171',
+                        border: status.type === 'success' ? '1px solid #10b981' : '1px solid #ef4444',
                         display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500
                     }}>
                         {status.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
@@ -161,60 +192,135 @@ export default function QuickOrder() {
 
             <form onSubmit={handleSubmit} className="glass-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
-                <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Transaction Date</label>
-                    <input type="date" name="date" value={formData.date} onChange={handleChange} required className="form-input" style={{ width: '100%', padding: '0.75rem' }} />
-                </div>
-
-                <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Account Name</label>
-                    <select
-                        name="account"
-                        value={formData.account}
-                        onChange={handleChange}
-                        required
-                        className="form-input"
-                        style={{ width: '100%', padding: '0.75rem' }}
-                        autoFocus
-                    >
-                        <option value="">Select Account...</option>
-                        {masterData.accounts.map(acc => (
-                            <option key={acc.id} value={acc.name}>{acc.name}</option>
-                        ))}
-                    </select>
-                </div>
-
-                <div>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Product Name</label>
-                    <select
-                        name="product"
-                        value={formData.product}
-                        onChange={handleChange}
-                        required
-                        className="form-input"
-                        style={{ width: '100%', padding: '0.75rem' }}
-                    >
-                        <option value="">Select Product...</option>
-                        {masterData.products.map(prod => (
-                            <option key={prod.id} value={prod.name}>{prod.name}</option>
-                        ))}
-                    </select>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                {/* Header Section */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Quantity</label>
-                        <input type="number" name="qty" value={formData.qty} onChange={handleChange} placeholder="0" required className="form-input" style={{ width: '100%', padding: '0.75rem' }} />
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Transaction Date</label>
+                        <input
+                            type="date"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            required
+                            className="form-input"
+                            style={{ width: '100%', padding: '0.75rem' }}
+                        />
                     </div>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Selling Price</label>
-                        <input type="number" step="0.01" name="price" value={formData.price} onChange={handleChange} placeholder="0.00" required className="form-input" style={{ width: '100%', padding: '0.75rem' }} />
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Account Name</label>
+                        <select
+                            value={account}
+                            onChange={(e) => setAccount(e.target.value)}
+                            required
+                            className="form-input"
+                            style={{ width: '100%', padding: '0.75rem' }}
+                            autoFocus
+                        >
+                            <option value="">Select Account...</option>
+                            {masterData.accounts.map(acc => (
+                                <option key={acc.id} value={acc.name}>{acc.name}</option>
+                            ))}
+                        </select>
                     </div>
                 </div>
 
-                <button type="submit" disabled={isSubmitting} className="btn btn-primary" style={{ marginTop: '1rem', padding: '1rem', justifyContent: 'center', fontSize: '1.1rem' }}>
-                    {isSubmitting ? <><Loader2 className="animate-spin" size={20} /> Saving...</> : 'Add Order'}
-                </button>
+                <div style={{ height: '1px', background: 'var(--border-color)', margin: '0.5rem 0' }}></div>
+
+                {/* Items Section */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <label style={{ display: 'block', fontWeight: 500, color: 'var(--primary)' }}>Order Items</label>
+
+                    {items.map((item, index) => (
+                        <div key={item.id} style={{
+                            display: 'grid',
+                            gridTemplateColumns: '3fr 1fr 1fr 40px',
+                            gap: '10px',
+                            alignItems: 'end',
+                            animation: 'slideIn 0.3s ease-out'
+                        }}>
+                            <div>
+                                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', display: index === 0 ? 'block' : 'none' }}>Product</label>
+                                <select
+                                    value={item.product}
+                                    onChange={(e) => updateItem(index, 'product', e.target.value)}
+                                    required
+                                    className="form-input"
+                                    style={{ width: '100%', padding: '0.6rem' }}
+                                >
+                                    <option value="">Select...</option>
+                                    {masterData.products.map(prod => (
+                                        <option key={prod.id} value={prod.name}>{prod.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', display: index === 0 ? 'block' : 'none' }}>Qty</label>
+                                <input
+                                    type="number"
+                                    value={item.qty}
+                                    onChange={(e) => updateItem(index, 'qty', e.target.value)}
+                                    placeholder="0"
+                                    required
+                                    className="form-input"
+                                    style={{ width: '100%', padding: '0.6rem' }}
+                                />
+                            </div>
+
+                            <div>
+                                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', display: index === 0 ? 'block' : 'none' }}>Price</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={item.price}
+                                    onChange={(e) => updateItem(index, 'price', e.target.value)}
+                                    placeholder="0.00"
+                                    required
+                                    className="form-input"
+                                    style={{ width: '100%', padding: '0.6rem' }}
+                                />
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => removeItem(index)}
+                                disabled={items.length === 1}
+                                style={{
+                                    background: 'rgba(239, 68, 68, 0.1)',
+                                    color: '#fca5a5',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    height: '42px',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    cursor: items.length === 1 ? 'not-allowed' : 'pointer',
+                                    opacity: items.length === 1 ? 0.5 : 1
+                                }}
+                            >
+                                <AlertCircle size={18} />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <button type="button" onClick={addItem} style={{
+                        background: 'transparent',
+                        border: '1px dashed var(--primary)',
+                        color: 'var(--primary)',
+                        padding: '8px 16px',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', gap: '8px',
+                        marginTop: '10px'
+                    }}>
+                        <Zap size={16} /> Add Another Product
+                    </button>
+                </div>
+
+                <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
+                    <button type="submit" disabled={isSubmitting} className="btn btn-primary" style={{ width: '100%', padding: '1rem', justifyContent: 'center', fontSize: '1.1rem' }}>
+                        {isSubmitting ? <><Loader2 className="animate-spin" size={20} /> Saving Order...</> : 'Save All Orders'}
+                    </button>
+                </div>
 
             </form>
         </div>

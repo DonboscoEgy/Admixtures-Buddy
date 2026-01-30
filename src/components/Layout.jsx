@@ -28,7 +28,12 @@ export default function Layout() {
         if (isAdmin) {
             checkFinancialHealth();
         }
-    }, [isAdmin]);
+
+        // Run Activity Check for everyone
+        if (user) {
+            checkUpcomingActivities();
+        }
+    }, [isAdmin, user]);
 
     const fetchNotifications = async () => {
         const { data } = await supabase

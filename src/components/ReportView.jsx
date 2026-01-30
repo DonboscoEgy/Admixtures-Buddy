@@ -165,7 +165,44 @@ export default function ReportView() {
         const contributedCustomers = new Set(currentMonthSales.map(r => r.account_name)).size;
 
 
+        // --- GLOBAL YEARLY STATS (Ignore Filters) ---
+        const calcYearStats = (year) => {
+            const yearSales = salesData.filter(d => new Date(d.transaction_date).getFullYear() === year);
+            const net = yearSales.reduce((sum, r) => sum + (Number(r.total_sales) || 0), 0);
+            const gp = yearSales.reduce((sum, r) => sum + (Number(r.gross_profit) || 0), 0);
+            return net > 0 ? (gp / net) * 100 : 0;
+        };
+        const margin2025 = calcYearStats(2025);
+        const margin2026 = calcYearStats(2026);
+
+
         // --- CHARTS PREP ---
+        // ... (Chart prep code remains the same, assuming we return the new margins)
+
+        return {
+            totalSalesGross,
+            totalGP,
+            totalQty,
+            totalCollections,
+            marginPct,
+            monthlyData,
+            categoryData,
+            topCustomers,
+            topProducts,
+            weekly: {
+                currentMonthName: new Date(Number(yearFilter), targetMonthIndex).toLocaleString('default', { month: 'long', year: 'numeric' }),
+                currM,
+                currCol,
+                growth,
+                avSellingPrice,
+                avGrossMargin,
+                margin2025, // Pass New Metric
+                margin2026, // Pass New Metric
+                contributedCustomers,
+                newCustomerNames: newCustomerNames.slice(0, 5)
+            }
+        };
+
 
         // 1. Monthly Trend
         const months = {};
@@ -529,7 +566,7 @@ function WeeklyReport({ metrics, year }) {
 
             {/* ROW 2: Monthly Breakdown */}
             <div className="glass-card" style={{
-                display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0',
+                display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0',
                 padding: '20px 0', marginBottom: '30px'
             }}>
                 <MetricBox title="Monthly Volume" value={`${num(currM.vol)} L`} growth={growth.vol} />
@@ -540,8 +577,16 @@ function WeeklyReport({ metrics, year }) {
                     <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'white', marginTop: '5px' }}>{currDecimal(avSellingPrice)}</div>
                 </div>
                 <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Av. Gross Margin</div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'white', marginTop: '5px' }}>{avGrossMargin.toFixed(0)}%</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Av. Selling Price</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'white', marginTop: '5px' }}>{currDecimal(avSellingPrice)}</div>
+                </div>
+                <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
+                    <div style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: 600 }}>Margin 2025</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#94a3b8', marginTop: '5px' }}>{weekly.margin2025.toFixed(1)}%</div>
+                </div>
+                <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
+                    <div style={{ fontSize: '0.85rem', color: '#10b981', fontWeight: 600 }}>Margin 2026</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#10b981', marginTop: '5px' }}>{weekly.margin2026.toFixed(1)}%</div>
                 </div>
             </div>
 

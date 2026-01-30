@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Added
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -46,6 +47,7 @@ const CATEGORIES = [
 export default function Pipeline() {
     const { user, profile } = useAuth();
     const { showToast } = useToast();
+    const navigate = useNavigate(); // Hook
     const [opportunities, setOpportunities] = useState([]);
     const [activeId, setActiveId] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -424,6 +426,8 @@ function OpportunityModal({ onClose, onSuccess, profile, initialData }) {
 
             showToast('Account Created & Opportunity Won! 🎉', 'success');
             onSuccess();
+            // Auto-navigate
+            navigate('/accounts', { state: { openAccountName: formData.account_name } });
         } catch (err) {
             console.error('Conversion Failed:', err);
             showToast('Failed to convert: ' + err.message, 'error');
@@ -532,7 +536,7 @@ function OpportunityModal({ onClose, onSuccess, profile, initialData }) {
                     </div>
 
                     <div className="modal-actions" style={{ justifyContent: 'space-between' }}>
-                        {initialData && (
+                        {initialData && formData.stage === 'Won' && (
                             <button
                                 type="button"
                                 onClick={handleConvertToAccount}

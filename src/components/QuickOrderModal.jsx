@@ -474,9 +474,9 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
                             </div>
                         )}
 
-                    </form>
-                )}
-            </div>
+                    </div>
         </div>
-    );
+            );
+}
+            );
 }

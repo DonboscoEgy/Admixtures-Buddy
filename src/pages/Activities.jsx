@@ -27,15 +27,26 @@ export default function Activities({ embeddedAccount = null }) {
     const [accounts, setAccounts] = useState([]);
     const [opportunities, setOpportunities] = useState([]);
 
+    // Filters
+    const [filters, setFilters] = useState({
+        targetId: '',
+        startDate: '',
+        endDate: ''
+    });
+
     useEffect(() => {
+        // Debounce or just fetch on change
         fetchActivities();
+    }, [filters, embeddedAccount]); // Refetch when filters change
+
+    useEffect(() => {
         if (!embeddedAccount) {
             fetchTargets();
         } else {
-            // If embedded, pre-select
+            // If embedded, pre-select for the *form*
             setSelectedTargetId(`ACC_${embeddedAccount.id}`);
         }
-    }, [embeddedAccount]);
+    }, [embeddedAccount]); // Run when embeddedAccount changes
 
     const fetchTargets = async () => {
         const { data: accs } = await supabase.from('accounts_master').select('id, name').order('name');
@@ -57,8 +68,27 @@ export default function Activities({ embeddedAccount = null }) {
             .order('activity_date', { ascending: false })
             .order('created_at', { ascending: false });
 
+        // 1. Embedded Mode (Force Filter)
         if (embeddedAccount) {
             query = query.eq('account_id', embeddedAccount.id);
+        }
+        // 2. Global Mode Filters
+        else {
+            if (filters.targetId) {
+                if (filters.targetId.startsWith('ACC_')) {
+                    query = query.eq('account_id', filters.targetId.replace('ACC_', ''));
+                } else if (filters.targetId.startsWith('OPP_')) {
+                    query = query.eq('opportunity_id', filters.targetId.replace('OPP_', ''));
+                }
+            }
+        }
+
+        // 3. Date Filters (Apply to both modes)
+        if (filters.startDate) {
+            query = query.gte('activity_date', filters.startDate);
+        }
+        if (filters.endDate) {
+            query = query.lte('activity_date', filters.endDate);
         }
 
         const { data, error } = await query;
@@ -149,14 +179,76 @@ export default function Activities({ embeddedAccount = null }) {
 
             {/* Header (Only if Global Page) */}
             {!embeddedAccount && (
-                <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                    <div>
-                        <div className="breadcrumb">Home / Activities</div>
-                        <h1 className="page-title">Activity Log</h1>
+                <div style={{ marginBottom: '20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '20px' }}>
+                        <div>
+                            <div className="breadcrumb">Home / Activities</div>
+                            <h1 className="page-title">Activity Log</h1>
+                        </div>
+                        <button onClick={() => setIsFormOpen(true)} className="btn-primary" style={{ display: 'flex', gap: '8px' }}>
+                            <Plus size={18} /> Log Activity
+                        </button>
                     </div>
-                    <button onClick={() => setIsFormOpen(true)} className="btn-primary" style={{ display: 'flex', gap: '8px' }}>
-                        <Plus size={18} /> Log Activity
-                    </button>
+
+                    {/* FILTER BAR */}
+                    <div className="glass-card" style={{ padding: '15px', display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
+
+                        {/* Account Filter */}
+                        <div style={{ flex: 2, minWidth: '200px' }}>
+                            <select
+                                className="form-input"
+                                style={{ margin: 0 }}
+                                value={filters.targetId}
+                                onChange={e => setFilters({ ...filters, targetId: e.target.value })}
+                            >
+                                <option value="">All Accounts & Opportunities</option>
+                                <optgroup label="Existing Accounts">
+                                    {accounts.map(a => (
+                                        <option key={`ACC_${a.id}`} value={`ACC_${a.id}`}>{a.name}</option>
+                                    ))}
+                                </optgroup>
+                                <optgroup label="Pipeline Opportunities">
+                                    {opportunities.map(o => (
+                                        <option key={`OPP_${o.id}`} value={`OPP_${o.id}`}>{o.account_name} ({o.stage})</option>
+                                    ))}
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        {/* Date Start */}
+                        <div style={{ flex: 1, minWidth: '140px' }}>
+                            <input
+                                type="date"
+                                className="form-input"
+                                style={{ margin: 0 }}
+                                placeholder="Start Date"
+                                value={filters.startDate}
+                                onChange={e => setFilters({ ...filters, startDate: e.target.value })}
+                            />
+                        </div>
+
+                        {/* Date End */}
+                        <div style={{ flex: 1, minWidth: '140px' }}>
+                            <input
+                                type="date"
+                                className="form-input"
+                                style={{ margin: 0 }}
+                                placeholder="End Date"
+                                value={filters.endDate}
+                                onChange={e => setFilters({ ...filters, endDate: e.target.value })}
+                            />
+                        </div>
+
+                        {/* Reset */}
+                        {(filters.targetId || filters.startDate || filters.endDate) && (
+                            <button
+                                onClick={() => setFilters({ targetId: '', startDate: '', endDate: '' })}
+                                style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '0.9rem', cursor: 'pointer', fontWeight: 600 }}
+                            >
+                                Clear
+                            </button>
+                        )}
+                    </div>
                 </div>
             )}
 

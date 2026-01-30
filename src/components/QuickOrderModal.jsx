@@ -417,21 +417,17 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
                             <p style={{ margin: '0 0 10px 0' }}>Good day to you.</p>
                             <p style={{ margin: '0 0 10px 0' }}>Kindly prepare a sales order for <b>{account || '[Account Name]'}</b> as follows</p>
 
-                            <ul style={{ margin: '10px 0', paddingLeft: '20px' }}>
+                            <div style={{ margin: '10px 0' }}>
                                 {items.filter(i => i.product && i.qty).length > 0 ? (
                                     items.filter(i => i.product && i.qty).map((item, idx) => (
-                                        <li key={idx} style={{ marginBottom: '4px' }}>
-                                            <b>{item.product}</b>: {item.qty} units
-                                        </li>
+                                        <div key={idx} style={{ marginBottom: '4px' }}>
+                                            {item.product} / {Number(item.qty).toLocaleString()} L
+                                        </div>
                                     ))
                                 ) : (
-                                    <li>(No items added yet)</li>
+                                    <div>(No items added yet)</div>
                                 )}
-                            </ul>
-
-                            <p style={{ margin: '10px 0' }}>For KCG it will be the same as Inshaa Precast, an intercompany account, and the payment is processed through offsetting.</p>
-
-                            <p style={{ margin: 0 }}>Thanks & Regards.</p>
+                            </div>
                         </div>
 
                         <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>

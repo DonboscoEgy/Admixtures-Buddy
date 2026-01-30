@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
+// Theme Context for Dark/Light Mode Management - Rebuild Trigger
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {

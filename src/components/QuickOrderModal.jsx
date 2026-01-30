@@ -25,6 +25,7 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
 
     const [status, setStatus] = useState({ type: '', message: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [sendEmail, setSendEmail] = useState(true); // Default ON
 
     // Master Data
     const [masterData, setMasterData] = useState({ accounts: [], products: [] });
@@ -148,7 +149,8 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
                 const { error: funcError } = await supabase.functions.invoke('send-order-email', {
                     body: {
                         customerName: account,
-                        items: validItems.map(i => ({ product: i.product, qty: i.qty }))
+                        items: validItems.map(i => ({ product: i.product, qty: i.qty })),
+                        sendEmail: sendEmail // Pass the user preference
                     }
                 });
                 if (funcError) console.error('Email trigger failed:', funcError);
@@ -382,6 +384,19 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
                         )}
 
                         <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
+                            <div style={{ marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <input
+                                    type="checkbox"
+                                    id="sendEmail"
+                                    checked={sendEmail}
+                                    onChange={(e) => setSendEmail(e.target.checked)}
+                                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                                />
+                                <label htmlFor="sendEmail" style={{ cursor: 'pointer', fontSize: '0.95rem', color: sendEmail ? 'var(--primary)' : 'var(--text-main)', fontWeight: 500 }}>
+                                    Send Email Confirmation (Outlook)
+                                </label>
+                            </div>
+
                             <button type="submit" disabled={isSubmitting} className="btn btn-primary" style={{ width: '100%', padding: '1rem', justifyContent: 'center', fontSize: '1.1rem' }}>
                                 {isSubmitting ? <><Loader2 className="animate-spin" size={20} /> Saving Order...</> : 'Save All Orders'}
                             </button>

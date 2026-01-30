@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom'; // Added
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
@@ -53,6 +53,22 @@ export default function Pipeline() {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingOp, setEditingOp] = useState(null);
+    const [ownerFilter, setOwnerFilter] = useState('All');
+
+    const uniqueOwners = useMemo(() => {
+        const owners = opportunities.map(op => op.sales_rep).filter(Boolean);
+        return [...new Set(owners)].sort();
+    }, [opportunities]);
+
+    const filteredOpportunities = useMemo(() => {
+        // 1. Strict User Filter
+        if (profile && !profile.is_admin) {
+            return opportunities.filter(op => op.sales_rep === profile.initials || op.sales_rep === profile.email);
+        }
+        // 2. Admin Filter
+        if (ownerFilter === 'All') return opportunities;
+        return opportunities.filter(op => op.sales_rep === ownerFilter);
+    }, [opportunities, ownerFilter, profile]);
 
     // Sensors
     const sensors = useSensors(
@@ -137,9 +153,24 @@ export default function Pipeline() {
                     <div className="breadcrumb">Home / Sales / Pipeline</div>
                     <h1 className="page-title">Opportunities Pipeline</h1>
                 </div>
-                <button onClick={() => setIsModalOpen(true)} className="btn-primary">
-                    <Plus size={20} /> Add Opportunity
-                </button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    {profile?.is_admin && (
+                        <select
+                            value={ownerFilter}
+                            onChange={(e) => setOwnerFilter(e.target.value)}
+                            className="form-input"
+                            style={{ width: '200px' }}
+                        >
+                            <option value="All">All Sales Reps</option>
+                            {uniqueOwners.map(owner => (
+                                <option key={owner} value={owner}>{owner}</option>
+                            ))}
+                        </select>
+                    )}
+                    <button onClick={() => setIsModalOpen(true)} className="btn-primary">
+                        <Plus size={20} /> Add Opportunity
+                    </button>
+                </div>
             </div>
 
             {/* Kanban Board - Compact */}
@@ -161,7 +192,7 @@ export default function Pipeline() {
                         <PipelineColumn
                             key={stage.id}
                             stage={stage}
-                            items={opportunities.filter(op => op.stage === stage.id)}
+                            items={filteredOpportunities.filter(op => op.stage === stage.id)}
                             onItemClick={handleEdit}
                         />
                     ))}

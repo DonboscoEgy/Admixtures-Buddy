@@ -79,7 +79,6 @@ export default function Layout() {
                     <NavItemMobile to="/sales-ledger" icon={<ScrollText size={20} />} label="Sales Ledger" setShow={setShowMobileMenu} />
                     <NavItemMobile to="/payments" icon={<CreditCard size={20} />} label="Payments" setShow={setShowMobileMenu} />
                     <NavItemMobile to="/accounts" icon={<Briefcase size={20} />} label="Accounts" setShow={setShowMobileMenu} />
-                    <NavItemMobile to="/quick-order" icon={<PlusCircle size={20} />} label="Create Order" setShow={setShowMobileMenu} />
                     <NavItemMobile to="/reports" icon={<FileText size={20} />} label="Reports" setShow={setShowMobileMenu} />
                     <NavItemMobile to="/products" icon={<Package size={20} />} label="Products" setShow={setShowMobileMenu} />
                     <NavItemMobile to="/masters" icon={<Settings size={20} />} label="Masters" setShow={setShowMobileMenu} />
@@ -202,7 +201,6 @@ function NavItems({ isAdmin }) {
             <NavItem to="/sales-ledger" icon={<ScrollText size={22} />} tooltip="Sales Ledger" />
             <NavItem to="/payments" icon={<CreditCard size={22} />} tooltip="Payments" />
             <NavItem to="/accounts" icon={<Briefcase size={22} />} tooltip="Accounts" />
-            <NavItem to="/quick-order" icon={<PlusCircle size={22} />} tooltip="Create Order" />
 
             <div style={{ height: '1px', background: 'var(--border-color)', width: '40px', margin: '5px auto' }} />
 

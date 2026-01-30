@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import SalesDataGrid from '../components/SalesDataGrid';
+import QuickOrderModal from '../components/QuickOrderModal';
 
 const SalesLedger = () => {
     const { isAdmin, user, profile } = useAuth();
@@ -21,6 +22,7 @@ const SalesLedger = () => {
     });
     // Mobile Filter Toggle State
     const [filtersVisible, setFiltersVisible] = useState(window.innerWidth > 768);
+    const [showQuickOrder, setShowQuickOrder] = useState(false);
 
     const [masterData, setMasterData] = useState({ accounts: [], products: [], salesReps: [] });
 
@@ -253,7 +255,7 @@ const SalesLedger = () => {
                 )}
 
                 <div style={{ display: 'flex', gap: '10px' }}>
-                    <button onClick={() => navigate('/quick-order')} className="btn-primary" style={{ backgroundColor: '#10B981', color: 'black' }}>
+                    <button onClick={() => setShowQuickOrder(true)} className="btn-primary" style={{ backgroundColor: '#10B981', color: 'black' }}>
                         + New Order
                     </button>
 
@@ -303,6 +305,16 @@ const SalesLedger = () => {
                     </div>
                 </div>
             </div>
+            {/* Quick Order Modal */}
+            {showQuickOrder && (
+                <QuickOrderModal
+                    onClose={() => setShowQuickOrder(false)}
+                    onSuccess={() => {
+                        fetchData();
+                        // Optional: Show a toast here if needed, but Modal handles its own success msg
+                    }}
+                />
+            )}
         </div>
     );
 };

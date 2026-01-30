@@ -1,8 +1,8 @@
+```
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import SalesLedger from './pages/SalesLedger';
-import QuickOrder from './pages/QuickOrder';
 import ReportView from './components/ReportView';
 import TestPage from './pages/TestPage';
 import EditOrder from './pages/EditOrder';
@@ -44,7 +44,6 @@ function App() {
                 <Route path="/sales-ledger" element={<SalesLedger />} />
                 <Route path="/sales-ledger/edit/:id" element={<EditOrder />} />
 
-                <Route path="/quick-order" element={<QuickOrder />} />
                 <Route path="/reports" element={<ReportView />} />
                 <Route path="/accounts" element={<Accounts />} />
                 <Route path="/products" element={<Products />} />

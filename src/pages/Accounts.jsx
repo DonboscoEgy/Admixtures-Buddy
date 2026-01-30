@@ -53,7 +53,11 @@ export default function Accounts() {
         if (accounts.length > 0 && location.state?.openAccountName) {
             const target = accounts.find(a => a.name === location.state.openAccountName);
             if (target) {
-                setSelectedAccount(target);
+                if (location.state.openSetup) {
+                    handleEditClick(target);
+                } else {
+                    setSelectedAccount(target);
+                }
                 // Optional: Clear state so it doesn't reopen on refresh? 
                 // simpler to just leave it for now.
                 window.history.replaceState({}, document.title); // visual cleanup

@@ -427,7 +427,7 @@ function OpportunityModal({ onClose, onSuccess, profile, initialData }) {
             showToast('Account Created & Opportunity Won! 🎉', 'success');
             onSuccess();
             // Auto-navigate
-            navigate('/accounts', { state: { openAccountName: formData.account_name } });
+            navigate('/accounts', { state: { openAccountName: formData.account_name, openSetup: true } });
         } catch (err) {
             console.error('Conversion Failed:', err);
             showToast('Failed to convert: ' + err.message, 'error');

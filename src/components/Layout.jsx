@@ -36,15 +36,17 @@ export default function Layout() {
                 zIndex: 20
             }}>
                 {/* Brand Logo */}
-                <div style={{ paddingBottom: '30px' }}>
-                    <div style={{
-                        width: '40px', height: '40px',
-                        background: 'linear-gradient(135deg, var(--primary), #2563eb)',
-                        borderRadius: '12px',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: 'white', fontWeight: 'bold', fontSize: '1.2rem',
-                        boxShadow: '0 0 15px var(--primary-glow)'
-                    }}>P</div>
+                <div style={{ paddingBottom: '30px', paddingTop: '10px' }}>
+                    <img
+                        src="/pleko_logo.png"
+                        alt="Pleko"
+                        style={{
+                            width: '40px',
+                            height: 'auto',
+                            objectFit: 'contain',
+                            filter: 'drop-shadow(0 0 8px rgba(16, 185, 129, 0.5))'
+                        }}
+                    />
                 </div>
 
                 {/* Navigation */}

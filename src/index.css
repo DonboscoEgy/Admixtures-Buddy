@@ -428,9 +428,9 @@ body {
 }
 
 .modal-content {
-  background: #111827;
-  /* Dark matching theme */
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--card-bg);
+  /* Use Theme Variable */
+  border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 24px;
   width: 100%;
@@ -451,13 +451,16 @@ body {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
-  color: white;
+  color: var(--text-main);
+  /* Theme Variable */
 }
 
 .close-btn {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-main);
+  /* Theme Variable */
+  border: 1px solid var(--border-color);
   border: none;
-  color: #94a3b8;
+  color: var(--text-muted);
   width: 32px;
   height: 32px;
   border-radius: 8px;

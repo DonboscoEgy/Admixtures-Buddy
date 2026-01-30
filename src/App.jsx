@@ -11,6 +11,7 @@ import Products from './pages/Products';
 import Payments from './pages/Payments';
 import Pipeline from './pages/Pipeline';
 import Dashboard from './pages/Dashboard'; // New
+import Activities from './pages/Activities';
 
 // Auth Pages
 import LandingPage from './pages/LandingPage';
@@ -41,6 +42,7 @@ function App() {
                 {/* Redirect root of internal layout to dashboard */}
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/sales-ledger" element={<SalesLedger />} />
+                <Route path="/activities" element={<Activities />} />
 
                 <Route path="/reports" element={<ReportView />} />
                 <Route path="/accounts" element={<Accounts />} />

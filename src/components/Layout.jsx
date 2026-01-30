@@ -3,7 +3,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import {
     LayoutDashboard, FileText, Zap, Settings, Bell, Search, Menu, LogOut, Users,
     DollarSign, ShieldCheck, X, RefreshCw, Package, PieChart, KanbanSquare,
-    ScrollText, CreditCard, PlusCircle, Briefcase
+    ScrollText, CreditCard, PlusCircle, Briefcase, Calendar
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CompleteProfileModal from './CompleteProfileModal';
@@ -75,6 +75,7 @@ export default function Layout() {
                 </div>
                 <nav style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     <NavItemMobile to="/dashboard" icon={<PieChart size={20} />} label="Dashboard" setShow={setShowMobileMenu} />
+                    <NavItemMobile to="/activities" icon={<Calendar size={20} />} label="Activities" setShow={setShowMobileMenu} />
                     <NavItemMobile to="/pipeline" icon={<KanbanSquare size={20} />} label="Pipeline" setShow={setShowMobileMenu} />
                     <NavItemMobile to="/sales-ledger" icon={<ScrollText size={20} />} label="Sales Ledger" setShow={setShowMobileMenu} />
                     <NavItemMobile to="/payments" icon={<CreditCard size={20} />} label="Payments" setShow={setShowMobileMenu} />
@@ -197,6 +198,7 @@ function NavItems({ isAdmin }) {
     return (
         <>
             <NavItem to="/dashboard" icon={<PieChart size={22} />} tooltip="Dashboard" />
+            <NavItem to="/activities" icon={<Calendar size={22} />} tooltip="Activities" />
             <NavItem to="/pipeline" icon={<KanbanSquare size={22} />} tooltip="Pipeline" />
             <NavItem to="/sales-ledger" icon={<ScrollText size={22} />} tooltip="Sales Ledger" />
             <NavItem to="/payments" icon={<CreditCard size={22} />} tooltip="Payments" />

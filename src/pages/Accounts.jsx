@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
+import Activities from './Activities';
 
 // --- MAIN PAGE COMPONENT ---
 export default function Accounts() {

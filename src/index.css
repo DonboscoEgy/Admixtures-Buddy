@@ -47,27 +47,29 @@
   --primary: #10b981;
   /* Keep same green */
   --primary-glow: rgba(16, 185, 129, 0.3);
-  --secondary: #94a3b8;
+  --secondary: #64748b;
 
   /* Backgrounds */
-  --bg-main: #f0f2f5;
-  /* Light Grey/Blue Tint */
-  --sidebar-bg: #feffff;
+  --bg-main: #f1f5f9;
+  /* Slate 100 - Distinct Light Grey */
+  --sidebar-bg: #ffffff;
   /* Pure White */
-  --header-bg: rgba(255, 255, 255, 0.85);
+  --header-bg: rgba(255, 255, 255, 0.95);
 
   /* Surfaces */
-  --card-bg: rgba(255, 255, 255, 0.9);
-  --card-border: rgba(0, 0, 0, 0.06);
+  --card-bg: #ffffff;
+  /* Pure solid white for best contrast */
+  --card-border: rgba(0, 0, 0, 0.1);
 
-  /* Text */
-  --text-main: #1f2937;
-  /* Dark Grey (Almost Black) */
-  --text-muted: #6b7280;
-  /* Medium Grey */
+  /* Text - High Contrast */
+  --text-main: #0f172a;
+  /* Slate 950 - Deep rich black */
+  --text-muted: #475569;
+  /* Slate 600 - Readable dark grey */
 
   /* Accents */
-  --border-color: rgba(0, 0, 0, 0.1);
+  --border-color: #cbd5e1;
+  /* Slate 300 - Visible borders */
 
   color-scheme: light;
 }

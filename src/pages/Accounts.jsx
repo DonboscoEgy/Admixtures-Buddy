@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import { Users, Plus, X, Save, Trash2, Database, Clock, DollarSign, Calendar, Settings } from 'lucide-react';
-import { useLocation } from 'react-router-dom'; // Added useLocation
+import { useLocation, useNavigate } from 'react-router-dom'; // Added useNavigate
 import {
     ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
@@ -11,11 +11,15 @@ import { useAuth } from '../context/AuthContext';
 // --- MAIN PAGE COMPONENT ---
 export default function Accounts() {
     const { profile } = useAuth();
-    const location = useLocation(); // Hook
+    const location = useLocation();
+    const navigate = useNavigate(); // Hook
     const [accounts, setAccounts] = useState([]);
     const [editingAccount, setEditingAccount] = useState(null);
     const [selectedAccount, setSelectedAccount] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Track if we've already handled the auto-open for this nav
+    const processedRef = useRef(false);
 
     const handleEditClick = (acc) => {
         setEditingAccount(acc);
@@ -50,7 +54,7 @@ export default function Accounts() {
 
     // Auto-open account if passed in state
     useEffect(() => {
-        if (accounts.length > 0 && location.state?.openAccountName) {
+        if (accounts.length > 0 && location.state?.openAccountName && !processedRef.current) {
             const target = accounts.find(a => a.name === location.state.openAccountName);
             if (target) {
                 if (location.state.openSetup) {
@@ -58,12 +62,15 @@ export default function Accounts() {
                 } else {
                     setSelectedAccount(target);
                 }
-                // Optional: Clear state so it doesn't reopen on refresh? 
-                // simpler to just leave it for now.
-                window.history.replaceState({}, document.title); // visual cleanup
+
+                // Mark processed to prevent loop
+                processedRef.current = true;
+
+                // Clear state properly
+                navigate(location.pathname, { replace: true, state: {} });
             }
         }
-    }, [accounts, location.state]);
+    }, [accounts, location.state, location.pathname, navigate]);
 
     const fetchAccounts = async () => {
         setLoading(true);

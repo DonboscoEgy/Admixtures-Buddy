@@ -419,10 +419,16 @@ function OpportunityModal({ onClose, onSuccess, profile, initialData }) {
 
             // 3. Delete Opportunity (Move to Account)
             if (initialData) {
-                await supabase
+                const { data: deleted, error: delError } = await supabase
                     .from('opportunities')
                     .delete()
-                    .eq('id', initialData.id);
+                    .eq('id', initialData.id)
+                    .select();
+
+                if (delError) throw delError;
+                if (!deleted || deleted.length === 0) {
+                    throw new Error('Permission denied: Could not delete opportunity. Please run the SQL script.');
+                }
             }
 
             showToast('Account Created & Opportunity Moved! 🎉', 'success');
@@ -441,13 +447,25 @@ function OpportunityModal({ onClose, onSuccess, profile, initialData }) {
         if (!confirm('Are you sure you want to delete this opportunity?')) return;
         setLoading(true);
         try {
-            const { error } = await supabase.from('opportunities').delete().eq('id', initialData.id);
+            const { data: deleted, error } = await supabase
+                .from('opportunities')
+                .delete()
+                .eq('id', initialData.id)
+                .select();
+
             if (error) throw error;
+            if (!deleted || deleted.length === 0) {
+                throw new Error('Permission denied: Could not delete opportunity. Please run the SQL script.');
+            }
+
+            // Optimistic Update
+            setOpportunities(prev => prev.filter(p => p.id !== initialData.id));
+
             showToast('Opportunity Deleted', 'success');
             onSuccess();
         } catch (err) {
             console.error('Delete Error:', err);
-            showToast('Failed to delete', 'error');
+            showToast('Failed to delete: ' + err.message, 'error');
         } finally {
             setLoading(false);
         }

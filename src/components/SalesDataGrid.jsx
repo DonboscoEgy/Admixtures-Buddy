@@ -99,6 +99,11 @@ const SalesDataGrid = ({ rowData, onSelectionChanged, onGridReady }) => {
         <div className="ag-theme-quartz-dark" style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
             <style>
                 {`
+                    .ag-theme-quartz-dark {
+                        --ag-selected-row-background-color: rgba(16, 185, 129, 0.15);
+                        --ag-row-hover-color: rgba(255, 255, 255, 0.03);
+                        --ag-checkbox-checked-color: #10b981;
+                    }
                     .ag-theme-quartz-dark .ag-header-cell-label { justify-content: center; }
                     /* Mobile adjustments */
                     @media (max-width: 768px) {

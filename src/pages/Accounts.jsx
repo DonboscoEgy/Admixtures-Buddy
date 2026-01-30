@@ -608,14 +608,14 @@ function AccountDetailsDashboard({ account, onEdit }) {
             </div>
 
             {/* Chart */}
-            <div className="glass-card" style={{ padding: '20px', background: 'rgba(0,0,0,0.2)', marginBottom: '30px' }}>
+            <div className="glass-card" style={{ padding: '20px', background: 'var(--bg-main)', border: '1px solid var(--border-color)', marginBottom: '30px' }}>
                 <h3 style={{ marginBottom: '20px', color: 'var(--text-muted)' }}>Performance Over Time</h3>
                 <div style={{ height: '350px', width: '100%' }}>
                     {chartData.length > 0 ? (
                         <ResponsiveContainer width="100%" height="100%">
                             <ComposedChart data={chartData}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.1)" />
-                                <XAxis dataKey="name" fontSize={12} stroke="#94a3b8" />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
+                                <XAxis dataKey="name" fontSize={12} stroke="var(--text-muted)" />
                                 <YAxis yAxisId="left" fontSize={12} stroke="#3b82f6" orientation="left" />
                                 <YAxis yAxisId="right" fontSize={12} stroke="#10b981" orientation="right" tickFormatter={(val) => `SAR ${val / 1000}k`} />
                                 <Tooltip contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', color: '#fff' }} />
@@ -633,7 +633,7 @@ function AccountDetailsDashboard({ account, onEdit }) {
             </div>
 
             {/* Payment History List */}
-            <div className="glass-card" style={{ padding: '20px', background: 'rgba(0,0,0,0.2)', marginBottom: '30px' }}>
+            <div className="glass-card" style={{ padding: '20px', background: 'var(--bg-main)', border: '1px solid var(--border-color)', marginBottom: '30px' }}>
                 <h3 style={{ marginBottom: '20px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <DollarSign size={20} color="#10b981" /> Payment History (All Time)
                 </h3>

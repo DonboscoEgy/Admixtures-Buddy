@@ -176,32 +176,7 @@ export default function ReportView() {
         const margin2026 = calcYearStats(2026);
 
 
-        // --- CHARTS PREP ---
-        // ... (Chart prep code remains the same, assuming we return the new margins)
 
-        return {
-            totalSalesGross,
-            totalGP,
-            totalQty,
-            totalCollections,
-            marginPct,
-            monthlyData,
-            categoryData,
-            topCustomers,
-            topProducts,
-            weekly: {
-                currentMonthName: new Date(Number(yearFilter), targetMonthIndex).toLocaleString('default', { month: 'long', year: 'numeric' }),
-                currM,
-                currCol,
-                growth,
-                avSellingPrice,
-                avGrossMargin,
-                margin2025, // Pass New Metric
-                margin2026, // Pass New Metric
-                contributedCustomers,
-                newCustomerNames: newCustomerNames.slice(0, 5)
-            }
-        };
 
 
         // 1. Monthly Trend
@@ -272,6 +247,8 @@ export default function ReportView() {
                 growth,
                 avSellingPrice,
                 avGrossMargin,
+                margin2025,
+                margin2026,
                 contributedCustomers,
                 newCustomerNames: newCustomerNames.slice(0, 5)
             }

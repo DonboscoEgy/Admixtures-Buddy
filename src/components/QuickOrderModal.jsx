@@ -143,6 +143,20 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
 
             setStatus({ type: 'success', message: `Successfully added ${validItems.length} orders!` });
 
+            // 🚀 Trigger Email Notification (Edge Function)
+            try {
+                const { error: funcError } = await supabase.functions.invoke('send-order-email', {
+                    body: {
+                        customerName: account,
+                        items: validItems.map(i => ({ product: i.product, qty: i.qty }))
+                    }
+                });
+                if (funcError) console.error('Email trigger failed:', funcError);
+                else console.log('Email trigger sent successfully');
+            } catch (err) {
+                console.warn('Failed to invoke email function:', err);
+            }
+
             // Trigger success callback
             setTimeout(() => {
                 if (onSuccess) onSuccess();

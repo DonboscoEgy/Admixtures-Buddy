@@ -189,7 +189,7 @@ export default function Payments() {
                                 <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
                                 <select
                                     className="form-input"
-                                    style={{ paddingLeft: '40px' }}
+                                    style={{ paddingLeft: '45px', textIndent: '5px' }}
                                     value={formData.account_name}
                                     onChange={e => setFormData({ ...formData, account_name: e.target.value })}
                                     disabled={!!selectedPayment} // Optional: Lock account on edit if desired, usually safer

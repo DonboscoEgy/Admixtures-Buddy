@@ -100,11 +100,22 @@ const SalesDataGrid = ({ rowData, onSelectionChanged, onGridReady }) => {
             <style>
                 {`
                     .ag-theme-quartz-dark {
-                        --ag-selected-row-background-color: rgba(16, 185, 129, 0.15);
-                        --ag-row-hover-color: rgba(255, 255, 255, 0.03);
-                        --ag-checkbox-checked-color: #10b981;
+                        --ag-selected-row-background-color: rgba(16, 185, 129, 0.2) !important;
+                        --ag-row-hover-color: rgba(255, 255, 255, 0.05) !important;
+                        --ag-checkbox-checked-color: #10b981 !important;
                     }
+                    /* Force overwrite of selected row background */
+                    .ag-theme-quartz-dark .ag-row-selected {
+                        background-color: rgba(16, 185, 129, 0.2) !important;
+                        border-bottom: 1px solid rgba(16, 185, 129, 0.3) !important;
+                    }
+                    /* Ensure text stays light */
+                    .ag-theme-quartz-dark .ag-row-selected .ag-cell {
+                        color: #f0fdf4 !important;
+                    }
+                    
                     .ag-theme-quartz-dark .ag-header-cell-label { justify-content: center; }
+                    
                     /* Mobile adjustments */
                     @media (max-width: 768px) {
                         .ag-theme-quartz-dark { font-size: 12px; }

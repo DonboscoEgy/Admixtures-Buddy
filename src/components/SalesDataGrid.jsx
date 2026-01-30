@@ -96,7 +96,17 @@ const SalesDataGrid = ({ rowData, onSelectionChanged, onGridReady }) => {
     }), []);
 
     return (
-        <div style={{ width: '100%', height: '100%' }} className="ag-theme-quartz-dark">
+        <div className="ag-theme-quartz-dark" style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
+            <style>
+                {`
+                    .ag-theme-quartz-dark .ag-header-cell-label { justify-content: center; }
+                    /* Mobile adjustments */
+                    @media (max-width: 768px) {
+                        .ag-theme-quartz-dark { font-size: 12px; }
+                        .ag-header-cell-text { font-size: 11px; }
+                    }
+                `}
+            </style>
             <AgGridReact
                 rowData={rowData}
                 columnDefs={columnDefs}
@@ -106,6 +116,7 @@ const SalesDataGrid = ({ rowData, onSelectionChanged, onGridReady }) => {
                 suppressRowClickSelection={true}
                 pagination={true}
                 paginationPageSize={20}
+                domLayout='autoHeight' // Better for mobile scrolling
                 onSelectionChanged={(event) => {
                     const selectedRows = event.api.getSelectedRows();
                     if (onSelectionChanged) onSelectionChanged(selectedRows);

@@ -292,27 +292,41 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
                                     </div>
 
                                     <div>
-                                        <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '4px', display: index === 0 ? 'block' : 'none' }}>Trans.</label>
-                                        <input
-                                            type="number" step="0.01"
-                                            value={item.transport}
-                                            onChange={(e) => updateItem(index, 'transport', e.target.value)}
-                                            placeholder="0.00"
-                                            className="form-input"
-                                            style={{ width: '100%', padding: '0.5rem', borderColor: item.transport ? '#f59e0b' : '' }}
-                                        />
+                                        <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '4px', display: index === 0 ? 'block' : 'none' }}>Trans. (Per L)</label>
+                                        <div style={{ position: 'relative' }}>
+                                            <input
+                                                type="number" step="0.01"
+                                                value={item.transport}
+                                                onChange={(e) => updateItem(index, 'transport', e.target.value)}
+                                                placeholder="0.00"
+                                                className="form-input"
+                                                style={{ width: '100%', padding: '0.5rem', borderColor: item.transport ? '#f59e0b' : '' }}
+                                            />
+                                            {item.qty && item.transport && (
+                                                <div style={{ position: 'absolute', right: 0, top: '-20px', fontSize: '0.7rem', color: '#f59e0b', fontWeight: 600 }}>
+                                                    {(item.qty * item.transport).toLocaleString()} SAR
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
 
                                     <div>
-                                        <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '4px', display: index === 0 ? 'block' : 'none' }}>Setup</label>
-                                        <input
-                                            type="number" step="0.01"
-                                            value={item.setup}
-                                            onChange={(e) => updateItem(index, 'setup', e.target.value)}
-                                            placeholder="0.00"
-                                            className="form-input"
-                                            style={{ width: '100%', padding: '0.5rem', borderColor: item.setup ? '#f59e0b' : '' }}
-                                        />
+                                        <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '4px', display: index === 0 ? 'block' : 'none' }}>Setup (Per L)</label>
+                                        <div style={{ position: 'relative' }}>
+                                            <input
+                                                type="number" step="0.01"
+                                                value={item.setup}
+                                                onChange={(e) => updateItem(index, 'setup', e.target.value)}
+                                                placeholder="0.00"
+                                                className="form-input"
+                                                style={{ width: '100%', padding: '0.5rem', borderColor: item.setup ? '#f59e0b' : '' }}
+                                            />
+                                            {item.qty && item.setup && (
+                                                <div style={{ position: 'absolute', right: 0, top: '-20px', fontSize: '0.7rem', color: '#f59e0b', fontWeight: 600 }}>
+                                                    {(item.qty * item.setup).toLocaleString()} SAR
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
 
                                     <button

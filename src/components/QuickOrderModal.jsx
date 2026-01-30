@@ -303,7 +303,7 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
                                                 style={{ width: '100%', padding: '0.5rem', borderColor: item.transport ? '#f59e0b' : '' }}
                                             />
                                             {item.qty && item.transport && (
-                                                <div style={{ position: 'absolute', right: 0, top: '-20px', fontSize: '0.7rem', color: '#f59e0b', fontWeight: 600 }}>
+                                                <div style={{ position: 'absolute', right: 0, bottom: '-18px', fontSize: '0.7rem', color: '#f59e0b', fontWeight: 600 }}>
                                                     {(item.qty * item.transport).toLocaleString()} SAR
                                                 </div>
                                             )}
@@ -322,7 +322,7 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
                                                 style={{ width: '100%', padding: '0.5rem', borderColor: item.setup ? '#f59e0b' : '' }}
                                             />
                                             {item.qty && item.setup && (
-                                                <div style={{ position: 'absolute', right: 0, top: '-20px', fontSize: '0.7rem', color: '#f59e0b', fontWeight: 600 }}>
+                                                <div style={{ position: 'absolute', right: 0, bottom: '-18px', fontSize: '0.7rem', color: '#f59e0b', fontWeight: 600 }}>
                                                     {(item.qty * item.setup).toLocaleString()} SAR
                                                 </div>
                                             )}

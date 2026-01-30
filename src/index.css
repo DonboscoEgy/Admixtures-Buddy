@@ -37,6 +37,39 @@
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   color-scheme: dark;
+
+  /* Smooth Theme Transition */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+[data-theme='light'] {
+  /* Brand Colors - Light Mode */
+  --primary: #10b981;
+  /* Keep same green */
+  --primary-glow: rgba(16, 185, 129, 0.3);
+  --secondary: #94a3b8;
+
+  /* Backgrounds */
+  --bg-main: #f0f2f5;
+  /* Light Grey/Blue Tint */
+  --sidebar-bg: #feffff;
+  /* Pure White */
+  --header-bg: rgba(255, 255, 255, 0.85);
+
+  /* Surfaces */
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --card-border: rgba(0, 0, 0, 0.06);
+
+  /* Text */
+  --text-main: #1f2937;
+  /* Dark Grey (Almost Black) */
+  --text-muted: #6b7280;
+  /* Medium Grey */
+
+  /* Accents */
+  --border-color: rgba(0, 0, 0, 0.1);
+
+  color-scheme: light;
 }
 
 body {

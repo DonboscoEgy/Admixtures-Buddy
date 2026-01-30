@@ -310,6 +310,7 @@ function OpportunityCard({ op, isOverlay }) {
 
 function OpportunityModal({ onClose, onSuccess, profile, initialData }) {
     const { showToast } = useToast();
+    const navigate = useNavigate(); // Added hook here
     const [loading, setLoading] = useState(false);
     const [accounts, setAccounts] = useState([]);
 

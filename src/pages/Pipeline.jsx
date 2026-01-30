@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom'; // Added
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import {
     DndContext,
     closestCenter,
@@ -227,6 +228,7 @@ export default function Pipeline() {
 // --- SUB-COMPONENTS ---
 
 function PipelineColumn({ stage, items, onItemClick }) {
+    const { theme } = useTheme();
     const { setNodeRef } = useSortable({
         id: stage.id,
         data: { type: 'Column', stageId: stage.id }
@@ -240,9 +242,9 @@ function PipelineColumn({ stage, items, onItemClick }) {
             minWidth: 0,
             display: 'flex',
             flexDirection: 'column',
-            background: 'rgba(0,0,0,0.2)',
+            background: theme === 'dark' ? 'rgba(0,0,0,0.3)' : '#e2e8f0',
             borderRadius: '12px',
-            border: `1px solid ${stage.color}20`
+            border: `1px solid ${stage.color}40`
         }}>
             <div style={{
                 padding: '12px 12px 4px 12px',
@@ -250,9 +252,9 @@ function PipelineColumn({ stage, items, onItemClick }) {
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: stage.color }}></div>
-                    <span style={{ fontWeight: 600, color: 'white', fontSize: '0.9rem' }}>{stage.label}</span>
+                    <span style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '0.9rem' }}>{stage.label}</span>
                 </div>
-                <span style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '8px', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                <span style={{ background: 'var(--card-bg)', padding: '2px 6px', borderRadius: '8px', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                     {items.length}
                 </span>
             </div>
@@ -260,8 +262,8 @@ function PipelineColumn({ stage, items, onItemClick }) {
             <div style={{
                 padding: '0 12px 12px 12px',
                 fontSize: '0.7rem',
-                color: 'rgba(255,255,255,0.4)',
-                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                color: 'var(--text-muted)',
+                borderBottom: '1px solid var(--border-color)',
                 display: 'flex', alignItems: 'center', gap: '4px'
             }}>
                 <Droplet size={10} />
@@ -294,61 +296,60 @@ function SortableCard({ op, onClick }) {
     );
 }
 
-function OpportunityCard({ op, isOverlay }) {
-    if (!op) return null;
-    return (
-        <div
-            className="glass-card opp-card-hover"
-            style={{
-                padding: '12px',
-                marginBottom: '8px',
-                cursor: 'grab',
-                border: '1px solid rgba(255,255,255,0.05)',
-                backgroundColor: '#1e293b',
-                boxShadow: isOverlay ? '0 10px 20px rgba(0,0,0,0.5)' : 'none',
-                transition: 'all 0.2s ease',
-            }}
-        >
-            <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'white', marginBottom: '6px' }}>{op.account_name}</h3>
+if (!op) return null;
+return (
+    <div
+        className="glass-card opp-card-hover"
+        style={{
+            padding: '12px',
+            marginBottom: '8px',
+            cursor: 'grab',
+            border: '1px solid var(--border-color)',
+            backgroundColor: 'var(--card-bg)',
+            boxShadow: isOverlay ? '0 10px 20px rgba(0,0,0,0.5)' : 'none',
+            transition: 'all 0.2s ease',
+        }}
+    >
+        <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '6px' }}>{op.account_name}</h3>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    <MapPin size={12} color="#60a5fa" />
-                    {op.location || '-'}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    <Droplet size={12} color="#f59e0b" />
-                    {op.expected_volume_liters ? `${Number(op.expected_volume_liters).toLocaleString()} L` : '-'}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    <Calendar size={12} color="#10b981" />
-                    {op.closing_date || '-'}
-                </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                <MapPin size={12} color="#60a5fa" />
+                {op.location || '-'}
             </div>
-
-            <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                {op.category && (
-                    <span className="badge" style={{ background: 'rgba(255,255,255,0.05)', color: '#94a3b8', fontSize: '0.7rem' }}>
-                        {op.category}
-                    </span>
-                )}
-                {op.sales_rep && (
-                    <div style={{
-                        width: '24px', height: '24px',
-                        borderRadius: '50%',
-                        background: '#3b82f6',
-                        color: 'white',
-                        fontSize: '0.65rem',
-                        fontWeight: 'bold',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        title: `Created by ${op.sales_rep}`
-                    }}>
-                        {op.sales_rep.substring(0, 2).toUpperCase()}
-                    </div>
-                )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                <Droplet size={12} color="#f59e0b" />
+                {op.expected_volume_liters ? `${Number(op.expected_volume_liters).toLocaleString()} L` : '-'}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                <Calendar size={12} color="#10b981" />
+                {op.closing_date || '-'}
             </div>
         </div>
-    );
+
+        <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {op.category && (
+                <span className="badge" style={{ background: 'var(--bg-main)', border: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.7rem' }}>
+                    {op.category}
+                </span>
+            )}
+            {op.sales_rep && (
+                <div style={{
+                    width: '24px', height: '24px',
+                    borderRadius: '50%',
+                    background: '#3b82f6',
+                    color: 'white',
+                    fontSize: '0.65rem',
+                    fontWeight: 'bold',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    title: `Created by ${op.sales_rep}`
+                }}>
+                    {op.sales_rep.substring(0, 2).toUpperCase()}
+                </div>
+            )}
+        </div>
+    </div>
+);
 }
 
 function OpportunityModal({ onClose, onSuccess, profile, initialData }) {

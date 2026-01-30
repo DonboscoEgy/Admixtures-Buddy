@@ -179,7 +179,7 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
                 <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
                     <h2 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '1.5rem', marginBottom: '0.2rem' }}>
                         <Zap size={24} fill="#eab308" color="#eab308" />
-                        {isEditMode ? 'Edit Order' : 'Quick Order (New)'}
+                        {isEditMode ? 'Edit Order' : 'Quick Order'}
                     </h2>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{isEditMode ? 'Update order details.' : 'Fast track data entry.'}</p>
 
@@ -298,7 +298,7 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
                                                 type="number" step="0.01"
                                                 value={item.transport}
                                                 onChange={(e) => updateItem(index, 'transport', e.target.value)}
-                                                placeholder="New Rate..."
+                                                placeholder="0.00"
                                                 className="form-input"
                                                 style={{ width: '100%', padding: '0.5rem', borderColor: item.transport ? '#f59e0b' : '' }}
                                             />

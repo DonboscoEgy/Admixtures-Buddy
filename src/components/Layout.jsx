@@ -130,16 +130,9 @@ export default function Layout() {
         // Let's rely on the user manually flagging for now OR just create a 'Welcome' notification if empty.
         // Or better: Create a demo alert for "System Live".
 
-        const { count } = await supabase.from('notifications').select('*', { count: 'exact' });
-        if (count === 0) {
-            await supabase.from('notifications').insert([{
-                title: 'System Online',
-                message: 'Notification system is active. Financial alerts will appear here.',
-                type: 'success',
-                is_read: false
-            }]);
-            fetchNotifications();
-        }
+        // Placeholder removed to prevent reappearance loop.
+        // Logic for checking financial limits will be implemented here when we have a reliable Balance view.
+
     };
 
     const handleSync = async () => {

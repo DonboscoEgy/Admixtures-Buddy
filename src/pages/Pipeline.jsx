@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
@@ -21,6 +20,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Plus, MapPin, Calendar, Package, Droplet, User, X } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import { NumericFormat } from 'react-number-format';
 
 // --- CONSTANTS ---
 const STAGES = [
@@ -31,6 +31,16 @@ const STAGES = [
     { id: 'Quotation', label: 'Quotation', color: '#f59e0b' },
     { id: 'Won', label: 'Won', color: '#10b981' },
     { id: 'Lost', label: 'Lost', color: '#ef4444' }
+];
+
+const CATEGORIES = [
+    'Readymix',
+    'Precast',
+    'Contractor',
+    'Applicator',
+    'Block',
+    'Tile',
+    'Other'
 ];
 
 export default function Pipeline() {
@@ -63,7 +73,7 @@ export default function Pipeline() {
             setOpportunities(data || []);
         } catch (error) {
             console.error('Error fetching pipeline:', error);
-            // showToast('Error loading pipeline', 'error'); // Optional: suppress if table doesn't exist yet
+            // Suppress error if table missing (first run)
         } finally {
             setLoading(false);
         }
@@ -119,7 +129,7 @@ export default function Pipeline() {
                 showToast(`Moved to ${newStage}`, 'success');
             } catch (err) {
                 console.error("Move failed", err);
-                showToast('Failed to update stage', 'error');
+                showToast('Failed to update stage: ' + err.message, 'error');
                 fetchOpportunities(); // Revert
             }
         }
@@ -180,6 +190,7 @@ export default function Pipeline() {
                         fetchOpportunities();
                         setIsModalOpen(false);
                     }}
+                    profile={profile}
                 />
             )}
         </div>
@@ -277,8 +288,8 @@ function OpportunityCard({ op, isOverlay }) {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    <Package size={14} color="#f59e0b" />
-                    {op.expected_volume_kg ? `${op.expected_volume_kg} kg` : '-'}
+                    <Droplet size={14} color="#f59e0b" />
+                    {op.expected_volume_liters ? `${Number(op.expected_volume_liters).toLocaleString()} L` : '-'}
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
@@ -298,7 +309,7 @@ function OpportunityCard({ op, isOverlay }) {
     );
 }
 
-function AddOpportunityModal({ onClose, onSuccess }) {
+function AddOpportunityModal({ onClose, onSuccess, profile }) {
     const { showToast } = useToast();
     const [loading, setLoading] = useState(false);
     const [accounts, setAccounts] = useState([]);
@@ -307,10 +318,10 @@ function AddOpportunityModal({ onClose, onSuccess }) {
     const [formData, setFormData] = useState({
         account_name: '',
         location: '',
-        category: 'Prospect',
+        category: 'Readymix',
         monthly_production_m3: '',
-        monthly_consumption_kg: '',
-        expected_volume_kg: '',
+        monthly_consumption_liters: '',
+        expected_volume_liters: '',
         closing_date: '',
         stage: 'Prospect'
     });
@@ -328,20 +339,30 @@ function AddOpportunityModal({ onClose, onSuccess }) {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handleNumberChange = (fieldName, floatValue) => {
+        setFormData({ ...formData, [fieldName]: floatValue });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+
+        const payload = {
+            ...formData,
+            sales_rep: profile?.initials || profile?.email || 'Unknown' // Auto-assign rep
+        };
+
         try {
             const { error } = await supabase
                 .from('opportunities')
-                .insert([formData]);
+                .insert([payload]);
 
             if (error) throw error;
-            showToast('Opportunity Created', 'success');
+            showToast('Opportunity Created Successfully', 'success');
             onSuccess();
         } catch (err) {
-            console.error(err);
-            showToast('Failed to create opportunity', 'error');
+            console.error('Create Op Error:', err);
+            showToast('Failed to create opportunity: ' + err.message + ' (Check Console)', 'error');
         } finally {
             setLoading(false);
         }
@@ -391,11 +412,8 @@ function AddOpportunityModal({ onClose, onSuccess }) {
                         <div>
                             <label className="form-label">Category</label>
                             <select name="category" className="form-input" value={formData.category} onChange={handleChange}>
-                                <option>Prospect</option>
-                                <option>In-House Trial</option>
-                                <option>Lab Trial</option>
-                                <option>Batch Trial</option>
-                                <option>Quotation</option>
+                                <option value="">Select...</option>
+                                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
                         </div>
                         <div>
@@ -409,23 +427,44 @@ function AddOpportunityModal({ onClose, onSuccess }) {
                     {/* Metrics */}
                     <div className="grid-responsive-3">
                         <div>
-                            <label className="form-label">Monthly Prod (m3)</label>
-                            <input type="number" name="monthly_production_m3" className="form-input" onChange={handleChange} />
+                            <label className="form-label">Monthly Concrete (m3)</label>
+                            <NumericFormat
+                                className="form-input"
+                                placeholder="e.g. 5,000"
+                                value={formData.monthly_production_m3}
+                                onValueChange={(values) => handleNumberChange('monthly_production_m3', values.floatValue)}
+                                thousandSeparator={true}
+                                allowNegative={false}
+                            />
                         </div>
                         <div>
-                            <label className="form-label">Consumption (kg)</label>
-                            <input type="number" name="monthly_consumption_kg" className="form-input" onChange={handleChange} />
+                            <label className="form-label">Monthly Admixture (L)</label>
+                            <NumericFormat
+                                className="form-input"
+                                placeholder="e.g. 20,000"
+                                value={formData.monthly_consumption_liters}
+                                onValueChange={(values) => handleNumberChange('monthly_consumption_liters', values.floatValue)}
+                                thousandSeparator={true}
+                                allowNegative={false}
+                            />
                         </div>
                         <div>
-                            <label className="form-label">Exp. Volume (kg)</label>
-                            <input type="number" name="expected_volume_kg" className="form-input" onChange={handleChange} />
+                            <label className="form-label">Expected Volume (L)</label>
+                            <NumericFormat
+                                className="form-input"
+                                placeholder="e.g. 15,000"
+                                value={formData.expected_volume_liters}
+                                onValueChange={(values) => handleNumberChange('expected_volume_liters', values.floatValue)}
+                                thousandSeparator={true}
+                                allowNegative={false}
+                            />
                         </div>
                     </div>
 
                     {/* Date */}
                     <div>
                         <label className="form-label">Expected Closing Date</label>
-                        <input type="date" name="closing_date" className="form-input" onChange={handleChange} required />
+                        <input type="date" name="closing_date" className="form-input" value={formData.closing_date} onChange={handleChange} required />
                     </div>
 
                     <div className="modal-actions">

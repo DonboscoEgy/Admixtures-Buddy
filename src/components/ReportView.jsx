@@ -521,7 +521,7 @@ function WeeklyReport({ metrics, year }) {
                     background: 'rgba(59, 130, 246, 0.2)', color: '#60a5fa',
                     fontWeight: 'bold', marginTop: '10px', border: '1px solid rgba(59, 130, 246, 0.3)'
                 }}>
-                    {currentMonthName} {year}
+                    {currentMonthName}
                 </span>
             </div>
 
@@ -549,10 +549,6 @@ function WeeklyReport({ metrics, year }) {
                 <MetricBox title="Monthly Volume" value={`${num(currM.vol)} L`} growth={growth.vol} />
                 <MetricBox title="Monthly Sales" value={curr(currM.sales)} growth={growth.sales} />
                 <MetricBox title="Monthly Collection" value={curr(currCol)} growth={growth.col} />
-                <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Av. Selling Price</div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'white', marginTop: '5px' }}>{currDecimal(avSellingPrice)}</div>
-                </div>
                 <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Av. Selling Price</div>
                     <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'white', marginTop: '5px' }}>{currDecimal(avSellingPrice)}</div>

@@ -509,7 +509,7 @@ function AccountDetailsDashboard({ account, onEdit }) {
                 {/* 1. Sales Stats */}
                 <div className="glass-card" style={{ padding: '20px', borderLeft: '4px solid #3b82f6', display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'bold' }}>TOTAL SALES (Inc. VAT)</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: 'white' }}>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: 'var(--text-main)' }}>
                         {metrics.totalSalesWithVat.toLocaleString('en-US', { style: 'currency', currency: 'SAR', maximumFractionDigits: 0 })}
                     </div>
                     <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'bold', marginTop: '10px' }}>TOTAL QUANTITY</div>
@@ -640,11 +640,11 @@ function AccountDetailsDashboard({ account, onEdit }) {
 
                 <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead style={{ position: 'sticky', top: 0, background: '#1e293b', zIndex: 1 }}>
+                        <thead style={{ position: 'sticky', top: 0, background: 'var(--bg-main)', zIndex: 1 }}>
                             <tr>
-                                <th style={{ textAlign: 'left', padding: '12px', color: 'var(--text-muted)', borderBottom: '1px solid #334155' }}>Date</th>
-                                <th style={{ textAlign: 'left', padding: '12px', color: 'var(--text-muted)', borderBottom: '1px solid #334155' }}>Amount</th>
-                                <th style={{ textAlign: 'left', padding: '12px', color: 'var(--text-muted)', borderBottom: '1px solid #334155' }}>Reference / Notes</th>
+                                <th style={{ textAlign: 'left', padding: '12px', color: 'var(--text-muted)', borderBottom: '1px solid var(--border-color)' }}>Date</th>
+                                <th style={{ textAlign: 'left', padding: '12px', color: 'var(--text-muted)', borderBottom: '1px solid var(--border-color)' }}>Amount</th>
+                                <th style={{ textAlign: 'left', padding: '12px', color: 'var(--text-muted)', borderBottom: '1px solid var(--border-color)' }}>Reference / Notes</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -654,8 +654,8 @@ function AccountDetailsDashboard({ account, onEdit }) {
                                 </tr>
                             ) : (
                                 recentPayments.map((p, idx) => (
-                                    <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                        <td style={{ padding: '12px', color: 'white' }}>{p.payment_date}</td>
+                                    <tr key={idx} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                        <td style={{ padding: '12px', color: 'var(--text-main)' }}>{p.payment_date}</td>
                                         <td style={{ padding: '12px', color: '#10b981', fontWeight: 'bold' }}>
                                             {Number(p.amount).toLocaleString('en-US', { style: 'currency', currency: 'SAR' })}
                                         </td>
@@ -683,7 +683,6 @@ function AccountDetailsDashboard({ account, onEdit }) {
                                     placeholder="Product Name"
                                     value={row.productName}
                                     onChange={e => handleChange(i, 'productName', e.target.value)}
-                                    style={{ background: '#0f172a', border: '1px solid #334155' }}
                                 />
                             </div>
                             <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -693,7 +692,6 @@ function AccountDetailsDashboard({ account, onEdit }) {
                                     type="number"
                                     value={row.price}
                                     onChange={e => handleChange(i, 'price', e.target.value)}
-                                    style={{ background: '#0f172a', border: '1px solid #334155' }}
                                 />
                                 <button
                                     onClick={() => handleRemoveRow(i)}

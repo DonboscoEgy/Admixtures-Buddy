@@ -242,9 +242,9 @@ function PipelineColumn({ stage, items, onItemClick }) {
             minWidth: 0,
             display: 'flex',
             flexDirection: 'column',
-            background: theme === 'dark' ? 'rgba(0,0,0,0.3)' : '#e2e8f0',
+            background: theme === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.5)',
             borderRadius: '12px',
-            border: `1px solid ${stage.color}40`
+            border: theme === 'dark' ? `1px solid ${stage.color}40` : '1px solid #e2e8f0'
         }}>
             <div style={{
                 padding: '12px 12px 4px 12px',
@@ -296,60 +296,61 @@ function SortableCard({ op, onClick }) {
     );
 }
 
-if (!op) return null;
-return (
-    <div
-        className="glass-card opp-card-hover"
-        style={{
-            padding: '12px',
-            marginBottom: '8px',
-            cursor: 'grab',
-            border: '1px solid var(--border-color)',
-            backgroundColor: 'var(--card-bg)',
-            boxShadow: isOverlay ? '0 10px 20px rgba(0,0,0,0.5)' : 'none',
-            transition: 'all 0.2s ease',
-        }}
-    >
-        <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '6px' }}>{op.account_name}</h3>
+function OpportunityCard({ op, isOverlay }) {
+    if (!op) return null;
+    return (
+        <div
+            className="glass-card opp-card-hover"
+            style={{
+                padding: '12px',
+                marginBottom: '8px',
+                cursor: 'grab',
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--card-bg)',
+                boxShadow: isOverlay ? '0 10px 20px rgba(0,0,0,0.5)' : 'none',
+                transition: 'all 0.2s ease',
+            }}
+        >
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '6px' }}>{op.account_name}</h3>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                <MapPin size={12} color="#60a5fa" />
-                {op.location || '-'}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                <Droplet size={12} color="#f59e0b" />
-                {op.expected_volume_liters ? `${Number(op.expected_volume_liters).toLocaleString()} L` : '-'}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                <Calendar size={12} color="#10b981" />
-                {op.closing_date || '-'}
-            </div>
-        </div>
-
-        <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            {op.category && (
-                <span className="badge" style={{ background: 'var(--bg-main)', border: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.7rem' }}>
-                    {op.category}
-                </span>
-            )}
-            {op.sales_rep && (
-                <div style={{
-                    width: '24px', height: '24px',
-                    borderRadius: '50%',
-                    background: '#3b82f6',
-                    color: 'white',
-                    fontSize: '0.65rem',
-                    fontWeight: 'bold',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    title: `Created by ${op.sales_rep}`
-                }}>
-                    {op.sales_rep.substring(0, 2).toUpperCase()}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    <MapPin size={12} color="#60a5fa" />
+                    {op.location || '-'}
                 </div>
-            )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    <Droplet size={12} color="#f59e0b" />
+                    {op.expected_volume_liters ? `${Number(op.expected_volume_liters).toLocaleString()} L` : '-'}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    <Calendar size={12} color="#10b981" />
+                    {op.closing_date || '-'}
+                </div>
+            </div>
+
+            <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                {op.category && (
+                    <span className="badge" style={{ background: 'var(--bg-main)', border: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.7rem' }}>
+                        {op.category}
+                    </span>
+                )}
+                {op.sales_rep && (
+                    <div style={{
+                        width: '24px', height: '24px',
+                        borderRadius: '50%',
+                        background: '#3b82f6',
+                        color: 'white',
+                        fontSize: '0.65rem',
+                        fontWeight: 'bold',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        title: `Created by ${op.sales_rep}`
+                    }}>
+                        {op.sales_rep.substring(0, 2).toUpperCase()}
+                    </div>
+                )}
+            </div>
         </div>
-    </div>
-);
+    );
 }
 
 function OpportunityModal({ onClose, onSuccess, profile, initialData }) {

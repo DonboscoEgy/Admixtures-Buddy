@@ -3,16 +3,24 @@ import { Zap, CheckCircle, AlertCircle, Loader2, X } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 
-export default function QuickOrderModal({ onClose, onSuccess }) {
+export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }) {
     const { profile } = useAuth();
+    const isEditMode = !!editOrder;
 
     // Header State
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-    const [account, setAccount] = useState('');
+    const [date, setDate] = useState(editOrder?.transaction_date || new Date().toISOString().split('T')[0]);
+    const [account, setAccount] = useState(editOrder?.account_name || '');
 
     // Items State
     const [items, setItems] = useState([
-        { id: Date.now(), product: '', qty: '', price: '', transport: '', setup: '' }
+        {
+            id: Date.now(),
+            product: editOrder?.product_name || '',
+            qty: editOrder?.quantity || '',
+            price: editOrder?.unit_price || '',
+            transport: editOrder?.transport_cost || '',
+            setup: editOrder?.setup_cost || ''
+        }
     ]);
 
     const [status, setStatus] = useState({ type: '', message: '' });
@@ -171,9 +179,9 @@ export default function QuickOrderModal({ onClose, onSuccess }) {
                 <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
                     <h2 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '1.5rem', marginBottom: '0.2rem' }}>
                         <Zap size={24} fill="#eab308" color="#eab308" />
-                        Quick Order
+                        {isEditMode ? 'Edit Order' : 'Quick Order'}
                     </h2>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Fast track data entry.</p>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{isEditMode ? 'Update order details.' : 'Fast track data entry.'}</p>
 
                     {status.message && (
                         <div style={{
@@ -310,7 +318,7 @@ export default function QuickOrderModal({ onClose, onSuccess }) {
                                     <button
                                         type="button"
                                         onClick={() => removeItem(index)}
-                                        disabled={items.length === 1}
+                                        disabled={items.length === 1 || isEditMode}
                                         style={{
                                             background: 'rgba(239, 68, 68, 0.1)',
                                             color: '#fca5a5',
@@ -318,8 +326,8 @@ export default function QuickOrderModal({ onClose, onSuccess }) {
                                             borderRadius: '8px',
                                             height: '42px',
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            cursor: items.length === 1 ? 'not-allowed' : 'pointer',
-                                            opacity: items.length === 1 ? 0.5 : 1
+                                            cursor: (items.length === 1 || isEditMode) ? 'not-allowed' : 'pointer',
+                                            opacity: (items.length === 1 || isEditMode) ? 0.5 : 1
                                         }}
                                     >
                                         <AlertCircle size={18} />
@@ -328,20 +336,22 @@ export default function QuickOrderModal({ onClose, onSuccess }) {
                             ))}
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'center' }}>
-                            <button type="button" onClick={addItem} style={{
-                                background: 'transparent',
-                                border: '1px dashed var(--primary)',
-                                color: 'var(--primary)',
-                                padding: '8px 16px',
-                                borderRadius: '8px',
-                                cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', gap: '8px',
-                                marginTop: '10px'
-                            }}>
-                                <Zap size={16} /> Add Another Product
-                            </button>
-                        </div>
+                        {!isEditMode && (
+                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                <button type="button" onClick={addItem} style={{
+                                    background: 'transparent',
+                                    border: '1px dashed var(--primary)',
+                                    color: 'var(--primary)',
+                                    padding: '8px 16px',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    display: 'flex', alignItems: 'center', gap: '8px',
+                                    marginTop: '10px'
+                                }}>
+                                    <Zap size={16} /> Add Another Product
+                                </button>
+                            </div>
+                        )}
 
                         <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
                             <button type="submit" disabled={isSubmitting} className="btn btn-primary" style={{ width: '100%', padding: '1rem', justifyContent: 'center', fontSize: '1.1rem' }}>

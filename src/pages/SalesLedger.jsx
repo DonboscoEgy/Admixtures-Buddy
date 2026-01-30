@@ -23,6 +23,7 @@ const SalesLedger = () => {
     // Mobile Filter Toggle State
     const [filtersVisible, setFiltersVisible] = useState(window.innerWidth > 768);
     const [showQuickOrder, setShowQuickOrder] = useState(false);
+    const [editingOrder, setEditingOrder] = useState(null);
 
     const [masterData, setMasterData] = useState({ accounts: [], products: [], salesReps: [] });
 
@@ -125,8 +126,8 @@ const SalesLedger = () => {
     // Handlers
     const handleEditSelected = () => {
         if (selectedRows.length !== 1) return;
-        const id = selectedRows[0].id; // Ensure view_sales_ledger has 'id'
-        navigate(`/sales-ledger/edit/${id}`);
+        setEditingOrder(selectedRows[0]);
+        setShowQuickOrder(true);
     };
 
     const handleBulkDelete = async () => {
@@ -308,10 +309,14 @@ const SalesLedger = () => {
             {/* Quick Order Modal */}
             {showQuickOrder && (
                 <QuickOrderModal
-                    onClose={() => setShowQuickOrder(false)}
+                    editOrder={editingOrder} // Pass selected order for editing
+                    onClose={() => {
+                        setShowQuickOrder(false);
+                        setEditingOrder(null); // Reset on close
+                    }}
                     onSuccess={() => {
                         fetchData();
-                        // Optional: Show a toast here if needed, but Modal handles its own success msg
+                        setEditingOrder(null);
                     }}
                 />
             )}

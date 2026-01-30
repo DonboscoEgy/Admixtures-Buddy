@@ -260,7 +260,7 @@ export default function ReportView() {
     if (!metrics) return null;
 
     return (
-        <div style={{ height: '100%', overflowY: 'auto', padding: '20px', paddingBottom: '100px', background: 'var(--bg-main)', color: 'white' }}>
+        <div style={{ height: '100%', overflowY: 'auto', padding: '20px', paddingBottom: '100px', background: 'var(--bg-main)', color: 'var(--text-main)' }}>
 
 
             {/* Header */}
@@ -486,7 +486,7 @@ function KpiCard({ title, value, icon, color, subValue, isCurrency = true }) {
                 <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'bold' }}>{title}</div>
             </div>
 
-            <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: 'white', marginBottom: '5px' }}>
+            <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: 'var(--text-main)', marginBottom: '5px' }}>
                 {isCurrency && typeof value === 'number'
                     ? value.toLocaleString('en-US', { style: 'currency', currency: 'SAR', maximumFractionDigits: 0 })
                     : value
@@ -513,7 +513,7 @@ function WeeklyReport({ metrics, year }) {
     return (
         <div style={{ paddingBottom: '50px' }}>
             <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-                <h2 style={{ color: 'white', fontWeight: 800, fontSize: '1.8rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                <h2 style={{ color: 'var(--text-main)', fontWeight: 800, fontSize: '1.8rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
                     Weekly Progress Report
                 </h2>
                 <span style={{
@@ -529,15 +529,15 @@ function WeeklyReport({ metrics, year }) {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '30px' }}>
                 <div className="glass-card" style={{ padding: '20px', textAlign: 'center' }}>
                     <div style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '10px', textTransform: 'uppercase' }}>YTD VOLUME</div>
-                    <div style={{ color: 'white', fontSize: '2rem', fontWeight: 800 }}>{num(totalQty)} <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>Ltr</span></div>
+                    <div style={{ color: 'var(--text-main)', fontSize: '2rem', fontWeight: 800 }}>{num(totalQty)} <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>Ltr</span></div>
                 </div>
                 <div className="glass-card" style={{ padding: '20px', textAlign: 'center' }}>
                     <div style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '10px', textTransform: 'uppercase' }}>YTD SALES</div>
-                    <div style={{ color: 'white', fontSize: '2rem', fontWeight: 800 }}>{curr(totalSalesGross)}</div>
+                    <div style={{ color: 'var(--text-main)', fontSize: '2rem', fontWeight: 800 }}>{curr(totalSalesGross)}</div>
                 </div>
                 <div className="glass-card" style={{ padding: '20px', textAlign: 'center' }}>
                     <div style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '10px', textTransform: 'uppercase' }}>YTD COLLECTION</div>
-                    <div style={{ color: 'white', fontSize: '2rem', fontWeight: 800 }}>{curr(totalCollections)}</div>
+                    <div style={{ color: 'var(--text-main)', fontSize: '2rem', fontWeight: 800 }}>{curr(totalCollections)}</div>
                 </div>
             </div>
 
@@ -551,7 +551,7 @@ function WeeklyReport({ metrics, year }) {
                 <MetricBox title="Monthly Collection" value={curr(currCol)} growth={growth.col} />
                 <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Av. Selling Price</div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'white', marginTop: '5px' }}>{currDecimal(avSellingPrice)}</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)', marginTop: '5px' }}>{currDecimal(avSellingPrice)}</div>
                 </div>
                 <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
                     <div style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: 600 }}>Margin 2025</div>
@@ -584,7 +584,7 @@ function WeeklyReport({ metrics, year }) {
 
                 <div className="glass-card" style={{ padding: '20px', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600 }}># Contributed Customers</div>
-                    <div style={{ fontSize: '3rem', fontWeight: 800, color: 'white' }}>{contributedCustomers}</div>
+                    <div style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--text-main)' }}>{contributedCustomers}</div>
                 </div>
 
                 <div className="glass-card" style={{ padding: '20px', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -642,7 +642,7 @@ function MetricBox({ title, value, growth }) {
     return (
         <div style={{ textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.1)' }}>
             <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>{title}</div>
-            <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'white', marginTop: '5px' }}>{value}</div>
+            <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-main)', marginTop: '5px' }}>{value}</div>
             {growth !== undefined && (
                 <div style={{ fontSize: '0.75rem', fontWeight: 700, color: isPos ? '#4ade80' : '#f87171', marginTop: '2px' }}>
                     {isPos ? '+' : ''}{growth.toFixed(0)}% vs prev

@@ -165,7 +165,7 @@ const SalesLedger = () => {
             {/* Header */}
             <div>
                 <div className="breadcrumb">Home / Sales / Sales Ledger</div>
-                <h1 className="page-title">Sales Ledger</h1>
+                <h1 className="page-title">Sales Ledger <span style={{ fontSize: '0.8rem', background: '#3b82f6', padding: '2px 8px', borderRadius: '4px', verticalAlign: 'middle' }}>v2.1</span></h1>
             </div>
 
             {/* Controls */}

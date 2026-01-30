@@ -298,7 +298,7 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
                                                 type="number" step="0.01"
                                                 value={item.transport}
                                                 onChange={(e) => updateItem(index, 'transport', e.target.value)}
-                                                placeholder="0.00"
+                                                placeholder="New Rate..."
                                                 className="form-input"
                                                 style={{ width: '100%', padding: '0.5rem', borderColor: item.transport ? '#f59e0b' : '' }}
                                             />

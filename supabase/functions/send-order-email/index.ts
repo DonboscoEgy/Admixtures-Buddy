@@ -39,9 +39,9 @@ serve(async (req) => {
 
         const emailBody = `
       <div style="font-family: Arial, sans-serif; color: #333;">
-          <p>Dear <b>${customerName}</b>,</p>
-          <p>Good day to you.</p>
-          <p>Please find below the new Sales Order details for your reference:</p>
+          <p>Dear <b>Sales Coordinator</b>,</p>
+          <p>Good day.</p>
+          <p>Please find below the new Sales Order details for <b>${customerName}</b>:</p>
           
           <ul style="background: #f9f9f9; padding: 15px 30px; border-radius: 8px;">
             ${terms}

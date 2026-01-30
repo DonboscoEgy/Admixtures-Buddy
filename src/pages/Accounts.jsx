@@ -481,11 +481,11 @@ function AccountDetailsDashboard({ account, onEdit }) {
             <div className="glass-card" style={{ padding: '20px', marginBottom: '20px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
                 <div>
                     <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Category</div>
-                    <div style={{ fontWeight: 'bold', color: 'white' }}>{account.account_family || '-'}</div>
+                    <div style={{ fontWeight: 'bold', color: 'var(--text-main)' }}>{account.account_family || '-'}</div>
                 </div>
                 <div>
                     <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Payment Type</div>
-                    <div style={{ fontWeight: 'bold', color: 'white' }}>{account.payment_type || '-'}</div>
+                    <div style={{ fontWeight: 'bold', color: 'var(--text-main)' }}>{account.payment_type || '-'}</div>
                 </div>
                 {account.payment_type === 'Credit Customer' && (
                     <>
@@ -542,7 +542,7 @@ function AccountDetailsDashboard({ account, onEdit }) {
 
                     <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: '10px', paddingTop: '10px' }}>
                         <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'bold' }}>LAST PAYMENT</div>
-                        <div style={{ fontSize: '1.1rem', color: '#d1fae5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ fontSize: '1.1rem', color: 'var(--text-main)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             {metrics.lastPaymentAmt > 0 ? (
                                 <>
                                     <span style={{ fontWeight: 'bold' }}>{Number(metrics.lastPaymentAmt).toLocaleString()} SAR</span>

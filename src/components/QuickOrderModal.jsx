@@ -370,110 +370,101 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
                             </div>
                         )}
 
-                        <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
-                            <div style={{ marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <input
-                                    type="checkbox"
-                                    id="sendEmail"
-                                    checked={sendEmail}
-                                    onChange={(e) => setSendEmail(e.target.checked)}
-                                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                                />
-                                <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem', display: 'flex', gap: '10px' }}>
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowEmailPreview(true)}
-                                        className="btn"
-                                        style={{ flex: 1, background: 'var(--bg-secondary)', color: 'var(--text-main)', border: '1px solid var(--border-color)', justifyContent: 'center' }}
-                                    >
-                                        📋 Copy Email Draft
-                                    </button>
+                        <div style={{ marginTop: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem', display: 'flex', gap: '10px' }}>
+                            <button
+                                type="button"
+                                onClick={() => setShowEmailPreview(true)}
+                                className="btn"
+                                style={{ flex: 1, background: 'var(--bg-secondary)', color: 'var(--text-main)', border: '1px solid var(--border-color)', justifyContent: 'center' }}
+                            >
+                                📋 Copy Email Draft
+                            </button>
 
-                                    <button type="submit" disabled={isSubmitting} className="btn btn-primary" style={{ flex: 2, padding: '1rem', justifyContent: 'center', fontSize: '1.1rem' }}>
-                                        {isSubmitting ? <><Loader2 className="animate-spin" size={20} /> Saving Order...</> : 'Save All Orders'}
-                                    </button>
-                                </div>
-
-                            </form>
-                )}
+                            <button type="submit" disabled={isSubmitting} className="btn btn-primary" style={{ flex: 2, padding: '1rem', justifyContent: 'center', fontSize: '1.1rem' }}>
+                                {isSubmitting ? <><Loader2 className="animate-spin" size={20} /> Saving Order...</> : 'Save All Orders'}
+                            </button>
                         </div>
 
-                        {/* Email Preview Modal */}
-                        {showEmailPreview && (
-                            <div style={{
-                                position: 'fixed', inset: 0, zIndex: 110,
-                                background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(3px)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center'
-                            }} onClick={() => setShowEmailPreview(false)}>
-                                <div onClick={e => e.stopPropagation()} className="glass-card" style={{
-                                    width: '500px', background: '#fff', color: '#333',
-                                    padding: '2rem', borderRadius: '12px', position: 'relative'
-                                }}>
-                                    <h3 style={{ marginTop: 0, color: '#111827', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        📧 Email Draft
-                                    </h3>
+                    </form>
+                )}
+            </div>
 
-                                    <div
-                                        id="email-content"
-                                        style={{
-                                            background: '#f9fafb', padding: '15px', borderRadius: '8px',
-                                            border: '1px solid #e5e7eb', margin: '15px 0',
-                                            fontFamily: 'Arial, sans-serif', fontSize: '14px', lineHeight: '1.5',
-                                            color: '#374151'
-                                        }}
-                                    >
-                                        <p style={{ margin: '0 0 10px 0' }}>Dear <b>Sales Coordinator</b>,</p>
-                                        <p style={{ margin: '0 0 10px 0' }}>Good day.</p>
-                                        <p style={{ margin: '0 0 10px 0' }}>Please find below the new Sales Order details for <b>{account || '[Account Name]'}</b>:</p>
+            {/* Email Preview Modal */}
+            {showEmailPreview && (
+                <div style={{
+                    position: 'fixed', inset: 0, zIndex: 110,
+                    background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(3px)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }} onClick={() => setShowEmailPreview(false)}>
+                    <div onClick={e => e.stopPropagation()} className="glass-card" style={{
+                        width: '500px', background: '#fff', color: '#333',
+                        padding: '2rem', borderRadius: '12px', position: 'relative'
+                    }}>
+                        <h3 style={{ marginTop: 0, color: '#111827', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            📧 Email Draft
+                        </h3>
 
-                                        <ul style={{ margin: '10px 0', paddingLeft: '20px' }}>
-                                            {items.filter(i => i.product && i.qty).length > 0 ? (
-                                                items.filter(i => i.product && i.qty).map((item, idx) => (
-                                                    <li key={idx} style={{ marginBottom: '4px' }}>
-                                                        <b>{item.product}</b>: {item.qty} units
-                                                    </li>
-                                                ))
-                                            ) : (
-                                                <li>(No items added yet)</li>
-                                            )}
-                                        </ul>
+                        <div
+                            id="email-content"
+                            style={{
+                                background: '#f9fafb', padding: '15px', borderRadius: '8px',
+                                border: '1px solid #e5e7eb', margin: '15px 0',
+                                fontFamily: 'Arial, sans-serif', fontSize: '14px', lineHeight: '1.5',
+                                color: '#374151'
+                            }}
+                        >
+                            <p style={{ margin: '0 0 10px 0' }}>Dear <b>Sales Coordinator</b>,</p>
+                            <p style={{ margin: '0 0 10px 0' }}>Good day.</p>
+                            <p style={{ margin: '0 0 10px 0' }}>Please find below the new Sales Order details for <b>{account || '[Account Name]'}</b>:</p>
 
-                                        <p style={{ margin: '10px 0' }}>For KCG it will be the same as Inshaa Precast, an intercompany account, and the payment is processed through offsetting.</p>
+                            <ul style={{ margin: '10px 0', paddingLeft: '20px' }}>
+                                {items.filter(i => i.product && i.qty).length > 0 ? (
+                                    items.filter(i => i.product && i.qty).map((item, idx) => (
+                                        <li key={idx} style={{ marginBottom: '4px' }}>
+                                            <b>{item.product}</b>: {item.qty} units
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li>(No items added yet)</li>
+                                )}
+                            </ul>
 
-                                        <p style={{ margin: 0 }}>Thanks & Regards.</p>
-                                    </div>
+                            <p style={{ margin: '10px 0' }}>For KCG it will be the same as Inshaa Precast, an intercompany account, and the payment is processed through offsetting.</p>
 
-                                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                                        <button
-                                            onClick={() => setShowEmailPreview(false)}
-                                            style={{ padding: '8px 16px', background: 'transparent', border: 'none', cursor: 'pointer', color: '#6b7280' }}
-                                        >
-                                            Close
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                const content = document.getElementById('email-content');
-                                                const range = document.createRange();
-                                                range.selectNode(content);
-                                                window.getSelection().removeAllRanges();
-                                                window.getSelection().addRange(range);
-                                                document.execCommand('copy');
-                                                window.getSelection().removeAllRanges();
-                                                alert('Copied to clipboard! You can paste it into Outlook.');
-                                                setShowEmailPreview(false);
-                                            }}
-                                            style={{
-                                                padding: '8px 20px', background: '#22c55e', color: 'white',
-                                                border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 600
-                                            }}
-                                        >
-                                            Copy Text
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                            <p style={{ margin: 0 }}>Thanks & Regards.</p>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                            <button
+                                onClick={() => setShowEmailPreview(false)}
+                                style={{ padding: '8px 16px', background: 'transparent', border: 'none', cursor: 'pointer', color: '#6b7280' }}
+                            >
+                                Close
+                            </button>
+                            <button
+                                onClick={() => {
+                                    const content = document.getElementById('email-content');
+                                    const range = document.createRange();
+                                    range.selectNode(content);
+                                    window.getSelection().removeAllRanges();
+                                    window.getSelection().addRange(range);
+                                    document.execCommand('copy');
+                                    window.getSelection().removeAllRanges();
+                                    alert('Copied to clipboard! You can paste it into Outlook.');
+                                    setShowEmailPreview(false);
+                                }}
+                                style={{
+                                    padding: '8px 20px', background: '#22c55e', color: 'white',
+                                    border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 600
+                                }}
+                            >
+                                Copy Text
+                            </button>
+                        </div>
                     </div>
+                </div>
+            )}
         </div>
+        </div >
             );
 }

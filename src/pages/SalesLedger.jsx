@@ -297,7 +297,7 @@ const SalesLedger = () => {
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '20px', paddingBottom: '10px' }}>
                 <div className="glass-card" style={{ padding: '15px 25px', minWidth: '150px', border: '1px solid rgba(59, 130, 246, 0.3)', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '5px' }}>Total Quantity</div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: 'white' }}>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: 'var(--text-main)' }}>
                         {activeTotals.qty.toLocaleString()}
                     </div>
                 </div>

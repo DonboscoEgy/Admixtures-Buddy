@@ -280,13 +280,28 @@ function OpportunityCard({ op, isOverlay }) {
                     {op.closing_date || '-'}
                 </div>
             </div>
-            {op.category && (
-                <div style={{ marginTop: '8px' }}>
+
+            <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                {op.category && (
                     <span className="badge" style={{ background: 'rgba(255,255,255,0.05)', color: '#94a3b8', fontSize: '0.7rem' }}>
                         {op.category}
                     </span>
-                </div>
-            )}
+                )}
+                {op.sales_rep && (
+                    <div style={{
+                        width: '24px', height: '24px',
+                        borderRadius: '50%',
+                        background: '#3b82f6',
+                        color: 'white',
+                        fontSize: '0.65rem',
+                        fontWeight: 'bold',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        title: `Created by ${op.sales_rep}`
+                    }}>
+                        {op.sales_rep.substring(0, 2).toUpperCase()}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

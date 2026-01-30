@@ -186,10 +186,10 @@ export default function Payments() {
                         <div>
                             <label className="form-label" style={{ color: 'var(--text-muted)' }}>Account Name</label>
                             <div style={{ position: 'relative' }}>
-                                <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+                                <User size={18} style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', zIndex: 10, pointerEvents: 'none' }} />
                                 <select
                                     className="form-input"
-                                    style={{ paddingLeft: '45px', textIndent: '5px' }}
+                                    style={{ paddingLeft: '55px', textIndent: '0px' }}
                                     value={formData.account_name}
                                     onChange={e => setFormData({ ...formData, account_name: e.target.value })}
                                     disabled={!!selectedPayment} // Optional: Lock account on edit if desired, usually safer
@@ -206,11 +206,11 @@ export default function Payments() {
                             <div>
                                 <label className="form-label" style={{ color: 'var(--text-muted)' }}>Amount (SAR)</label>
                                 <div style={{ position: 'relative' }}>
-                                    <DollarSign size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+                                    <DollarSign size={18} style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', zIndex: 10, pointerEvents: 'none' }} />
                                     <input
                                         type="number"
                                         className="form-input"
-                                        style={{ paddingLeft: '45px' }}
+                                        style={{ paddingLeft: '50px' }}
                                         placeholder="0.00"
                                         value={formData.amount}
                                         onChange={e => setFormData({ ...formData, amount: e.target.value })}
@@ -221,11 +221,11 @@ export default function Payments() {
                             <div>
                                 <label className="form-label" style={{ color: 'var(--text-muted)' }}>Payment Date</label>
                                 <div style={{ position: 'relative' }}>
-                                    <Calendar size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+                                    <Calendar size={18} style={{ position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', zIndex: 10, pointerEvents: 'none' }} />
                                     <input
                                         type="date"
                                         className="form-input"
-                                        style={{ paddingLeft: '45px' }}
+                                        style={{ paddingLeft: '50px' }}
                                         value={formData.payment_date}
                                         onChange={e => setFormData({ ...formData, payment_date: e.target.value })}
                                     />

@@ -388,6 +388,50 @@ function OpportunityModal({ onClose, onSuccess, profile, initialData }) {
         }
     };
 
+    const handleConvertToAccount = async () => {
+        if (!formData.account_name) return;
+        setLoading(true);
+        try {
+            // 1. Check if exists
+            const { data: existing } = await supabase
+                .from('accounts_master')
+                .select('id')
+                .eq('name', formData.account_name)
+                .single();
+
+            if (existing) {
+                showToast('Account already exists!', 'error');
+                setLoading(false);
+                return;
+            }
+
+            // 2. Create Account
+            const { error: accError } = await supabase.from('accounts_master').insert([{
+                name: formData.account_name,
+                account_family: formData.category,
+                created_by_initials: profile?.initials || 'SYS'
+            }]);
+
+            if (accError) throw accError;
+
+            // 3. Mark Opportunity as Won
+            if (initialData) {
+                await supabase
+                    .from('opportunities')
+                    .update({ stage: 'Won' })
+                    .eq('id', initialData.id);
+            }
+
+            showToast('Account Created & Opportunity Won! 🎉', 'success');
+            onSuccess();
+        } catch (err) {
+            console.error('Conversion Failed:', err);
+            showToast('Failed to convert: ' + err.message, 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={e => e.stopPropagation()} style={{ overflowY: 'auto', maxHeight: '90vh' }}>

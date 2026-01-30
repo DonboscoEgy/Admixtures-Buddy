@@ -201,6 +201,8 @@ function PipelineColumn({ stage, items, onItemClick }) {
         data: { type: 'Column', stageId: stage.id }
     });
 
+    const totalVolume = items.reduce((sum, item) => sum + (Number(item.expected_volume_liters) || 0), 0);
+
     return (
         <div ref={setNodeRef} style={{
             flex: '1 1 0',
@@ -212,8 +214,7 @@ function PipelineColumn({ stage, items, onItemClick }) {
             border: `1px solid ${stage.color}20`
         }}>
             <div style={{
-                padding: '12px',
-                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                padding: '12px 12px 4px 12px',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -223,6 +224,17 @@ function PipelineColumn({ stage, items, onItemClick }) {
                 <span style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '8px', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                     {items.length}
                 </span>
+            </div>
+
+            <div style={{
+                padding: '0 12px 12px 12px',
+                fontSize: '0.7rem',
+                color: 'rgba(255,255,255,0.4)',
+                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                display: 'flex', alignItems: 'center', gap: '4px'
+            }}>
+                <Droplet size={10} />
+                {totalVolume.toLocaleString()} L
             </div>
 
             <div style={{ flex: 1, padding: '8px', overflowY: 'auto' }}>

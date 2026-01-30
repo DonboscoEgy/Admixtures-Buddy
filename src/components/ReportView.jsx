@@ -385,12 +385,12 @@ export default function ReportView() {
                             <h3 style={{ color: 'var(--text-muted)', fontSize: '1rem', marginBottom: '20px' }}>Monthly Sales & Profit Trend</h3>
                             <ResponsiveContainer width="100%" height="90%">
                                 <ComposedChart data={metrics.monthlyData}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.1)" />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
                                     <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={12} />
                                     <YAxis stroke="var(--text-muted)" fontSize={12} tickFormatter={val => `${val / 1000}k`} />
                                     <Tooltip
-                                        contentStyle={{ backgroundColor: '#1e293b', borderColor: 'rgba(255,255,255,0.1)', color: 'white' }}
-                                        itemStyle={{ color: 'white' }}
+                                        contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-main)' }}
+                                        itemStyle={{ color: 'var(--text-main)' }}
                                         formatter={(val) => val.toLocaleString()}
                                     />
                                     <Legend />
@@ -419,7 +419,7 @@ export default function ReportView() {
                                         ))}
                                     </Pie>
                                     <Tooltip
-                                        contentStyle={{ backgroundColor: '#1e293b', borderColor: 'rgba(255,255,255,0.1)', color: 'white' }}
+                                        contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-main)' }}
                                         formatter={(val) => val.toLocaleString()}
                                     />
                                     <Legend verticalAlign="bottom" height={36} />
@@ -437,12 +437,12 @@ export default function ReportView() {
                             <h3 style={{ color: 'var(--text-muted)', fontSize: '1rem', marginBottom: '20px' }}>Top 5 Customers</h3>
                             <ResponsiveContainer width="100%" height="90%">
                                 <BarChart data={metrics.topCustomers} layout="vertical" margin={{ left: 20 }}>
-                                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="rgba(255,255,255,0.1)" />
+                                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--border-color)" />
                                     <XAxis type="number" hide />
                                     <YAxis dataKey="name" type="category" width={100} stroke="var(--text-muted)" fontSize={11} />
                                     <Tooltip
-                                        cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                                        contentStyle={{ backgroundColor: '#1e293b', borderColor: 'rgba(255,255,255,0.1)', color: 'white' }}
+                                        cursor={{ fill: 'var(--bg-main)' }}
+                                        contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-main)' }}
                                         formatter={(val) => val.toLocaleString()}
                                     />
                                     <Bar dataKey="value" fill="#10b981" radius={[0, 4, 4, 0]} barSize={20} />
@@ -455,12 +455,12 @@ export default function ReportView() {
                             <h3 style={{ color: 'var(--text-muted)', fontSize: '1rem', marginBottom: '20px' }}>Top 5 Products (Volume)</h3>
                             <ResponsiveContainer width="100%" height="90%">
                                 <BarChart data={metrics.topProducts} layout="vertical" margin={{ left: 20 }}>
-                                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="rgba(255,255,255,0.1)" />
+                                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--border-color)" />
                                     <XAxis type="number" hide />
                                     <YAxis dataKey="name" type="category" width={100} stroke="var(--text-muted)" fontSize={11} />
                                     <Tooltip
-                                        cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                                        contentStyle={{ backgroundColor: '#1e293b', borderColor: 'rgba(255,255,255,0.1)', color: 'white' }}
+                                        cursor={{ fill: 'var(--bg-main)' }}
+                                        contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-main)' }}
                                         formatter={(val) => val.toLocaleString()}
                                     />
                                     <Bar dataKey="value" fill="#f59e0b" radius={[0, 4, 4, 0]} barSize={20} />
@@ -569,14 +569,14 @@ function WeeklyReport({ metrics, year }) {
                     <h3 style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '10px' }}>YTD Volume vs Sales Trend</h3>
                     <ResponsiveContainer width="100%" height={150}>
                         <ComposedChart data={metrics.monthlyData}>
-                            <XAxis dataKey="name" fontSize={10} stroke="rgba(255,255,255,0.3)" />
+                            <XAxis dataKey="name" fontSize={10} stroke="var(--text-muted)" />
                             <YAxis yAxisId="left" fontSize={10} hide />
                             <YAxis yAxisId="right" orientation="right" fontSize={10} hide />
                             <Line yAxisId="left" type="monotone" dataKey="Sales" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3 }} />
                             <Line yAxisId="right" type="monotone" dataKey="Volume" stroke="#ec4899" strokeWidth={2} dot={{ r: 3 }} />
                             <Tooltip
-                                contentStyle={{ backgroundColor: '#1e293b', borderColor: 'rgba(255,255,255,0.1)', color: 'white' }}
-                                itemStyle={{ fontSize: '12px' }}
+                                contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-main)' }}
+                                itemStyle={{ fontSize: '12px', color: 'var(--text-main)' }}
                             />
                         </ComposedChart>
                     </ResponsiveContainer>
@@ -605,12 +605,12 @@ function WeeklyReport({ metrics, year }) {
                     <h3 style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '15px' }}>Current Month Sales by Customer</h3>
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={metrics.topCustomers} layout="vertical" margin={{ left: 10, right: 10 }}>
-                            <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="rgba(255,255,255,0.1)" />
-                            <XAxis type="number" fontSize={10} stroke="rgba(255,255,255,0.3)" />
-                            <YAxis dataKey="name" type="category" width={80} fontSize={10} stroke="rgba(255,255,255,0.3)" />
+                            <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--border-color)" />
+                            <XAxis type="number" fontSize={10} stroke="var(--text-muted)" />
+                            <YAxis dataKey="name" type="category" width={80} fontSize={10} stroke="var(--text-muted)" />
                             <Tooltip
-                                cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                                contentStyle={{ backgroundColor: '#1e293b', borderColor: 'rgba(255,255,255,0.1)', color: 'white' }}
+                                cursor={{ fill: 'var(--bg-main)' }}
+                                contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-main)' }}
                             />
                             <Bar dataKey="value" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={15} />
                         </BarChart>
@@ -621,12 +621,12 @@ function WeeklyReport({ metrics, year }) {
                     <h3 style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '15px' }}>Lifetime Sales by Customer</h3>
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={metrics.topCustomers} layout="vertical" margin={{ left: 10, right: 10 }}>
-                            <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="rgba(255,255,255,0.1)" />
-                            <XAxis type="number" fontSize={10} stroke="rgba(255,255,255,0.3)" />
-                            <YAxis dataKey="name" type="category" width={80} fontSize={10} stroke="rgba(255,255,255,0.3)" />
+                            <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--border-color)" />
+                            <XAxis type="number" fontSize={10} stroke="var(--text-muted)" />
+                            <YAxis dataKey="name" type="category" width={80} fontSize={10} stroke="var(--text-muted)" />
                             <Tooltip
-                                cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                                contentStyle={{ backgroundColor: '#1e293b', borderColor: 'rgba(255,255,255,0.1)', color: 'white' }}
+                                cursor={{ fill: 'var(--bg-main)' }}
+                                contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-main)' }}
                             />
                             <Bar dataKey="value" fill="#10b981" radius={[0, 4, 4, 0]} barSize={15} />
                         </BarChart>

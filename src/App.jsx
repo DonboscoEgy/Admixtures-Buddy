@@ -10,6 +10,7 @@ import Masters from './pages/Masters';
 import Accounts from './pages/Accounts';
 import Products from './pages/Products';
 import Payments from './pages/Payments';
+import Pipeline from './pages/Pipeline';
 
 // Auth Pages
 import LandingPage from './pages/LandingPage';
@@ -48,6 +49,7 @@ function App() {
                 <Route path="/accounts" element={<Accounts />} />
                 <Route path="/products" element={<Products />} />
                 <Route path="/payments" element={<Payments />} />
+                <Route path="/pipeline" element={<Pipeline />} />
                 <Route path="/masters" element={<Masters />} />
 
                 <Route path="/admin/users" element={<AdminUsers />} />

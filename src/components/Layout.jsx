@@ -69,7 +69,8 @@ export default function Layout() {
                 </div>
                 <nav style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     <NavItemMobile to="/dashboard" icon={<LayoutDashboard size={20} />} label="Sales Ledger" setShow={setShowMobileMenu} />
-                    <NavItemMobile to="/quick-order" icon={<Zap size={20} />} label="Quick Order" setShow={setShowMobileMenu} />
+                    <NavItemMobile to="/pipeline" icon={<Zap size={20} />} label="Pipeline" setShow={setShowMobileMenu} />
+                    <NavItemMobile to="/quick-order" icon={<FileText size={20} />} label="Quick Order" setShow={setShowMobileMenu} />
                     <NavItemMobile to="/reports" icon={<FileText size={20} />} label="Reports" setShow={setShowMobileMenu} />
                     <NavItemMobile to="/accounts" icon={<Users size={20} />} label="Accounts" setShow={setShowMobileMenu} />
                     <NavItemMobile to="/products" icon={<Package size={20} />} label="Products" setShow={setShowMobileMenu} />
@@ -190,7 +191,8 @@ function NavItems({ isAdmin }) {
     return (
         <>
             <NavItem to="/dashboard" icon={<LayoutDashboard size={22} />} tooltip="Sales Ledger" />
-            <NavItem to="/quick-order" icon={<Zap size={22} />} tooltip="Quick Order" />
+            <NavItem to="/pipeline" icon={<Zap size={22} />} tooltip="Pipeline" />
+            <NavItem to="/quick-order" icon={<FileText size={22} />} tooltip="Quick Order" />
             <NavItem to="/reports" icon={<FileText size={22} />} tooltip="Reports" />
             <NavItem to="/accounts" icon={<Users size={22} />} tooltip="Accounts" />
             <NavItem to="/products" icon={<Package size={22} />} tooltip="Products" />

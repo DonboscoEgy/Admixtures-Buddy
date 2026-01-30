@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../supabaseClient';
 import { Users, Plus, X, Save, Trash2, Database, Clock, DollarSign, Calendar, Settings } from 'lucide-react';
+import { useLocation } from 'react-router-dom'; // Added useLocation
 import {
     ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
@@ -10,6 +11,7 @@ import { useAuth } from '../context/AuthContext';
 // --- MAIN PAGE COMPONENT ---
 export default function Accounts() {
     const { profile } = useAuth();
+    const location = useLocation(); // Hook
     const [accounts, setAccounts] = useState([]);
     const [editingAccount, setEditingAccount] = useState(null);
     const [selectedAccount, setSelectedAccount] = useState(null);
@@ -45,6 +47,19 @@ export default function Accounts() {
     useEffect(() => {
         fetchAccounts();
     }, []);
+
+    // Auto-open account if passed in state
+    useEffect(() => {
+        if (accounts.length > 0 && location.state?.openAccountName) {
+            const target = accounts.find(a => a.name === location.state.openAccountName);
+            if (target) {
+                setSelectedAccount(target);
+                // Optional: Clear state so it doesn't reopen on refresh? 
+                // simpler to just leave it for now.
+                window.history.replaceState({}, document.title); // visual cleanup
+            }
+        }
+    }, [accounts, location.state]);
 
     const fetchAccounts = async () => {
         setLoading(true);

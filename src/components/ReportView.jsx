@@ -141,6 +141,7 @@ export default function ReportView() {
         const calcSet = (dataset) => ({
             vol: dataset.reduce((sum, r) => sum + (Number(r.quantity) || 0), 0),
             sales: dataset.reduce((sum, r) => sum + (Number(r.total_with_vat) || 0), 0),
+            netSales: dataset.reduce((sum, r) => sum + (Number(r.total_sales) || 0), 0),
             gp: dataset.reduce((sum, r) => sum + (Number(r.gross_profit) || 0), 0)
         });
 
@@ -159,8 +160,8 @@ export default function ReportView() {
             col: prevCol ? ((currCol - prevCol) / prevCol) * 100 : 0
         };
 
-        const avSellingPrice = currM.vol > 0 ? (currM.sales / currM.vol) : 0;
-        const avGrossMargin = currM.sales > 0 ? (currM.gp / currM.sales) * 100 : 0;
+        const avSellingPrice = currM.vol > 0 ? (currM.netSales / currM.vol) : 0;
+        const avGrossMargin = currM.netSales > 0 ? (currM.gp / currM.netSales) * 100 : 0;
         const contributedCustomers = new Set(currentMonthSales.map(r => r.account_name)).size;
 
 
@@ -492,6 +493,7 @@ function WeeklyReport({ metrics, year }) {
     // Helper formatting
     const num = (v) => v.toLocaleString();
     const curr = (v) => (v || 0).toLocaleString('en-US', { style: 'currency', currency: 'SAR', maximumFractionDigits: 0 });
+    const currDecimal = (v) => (v || 0).toLocaleString('en-US', { style: 'currency', currency: 'SAR', minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const growthColor = (v) => v > 0 ? '#10b981' : (v < 0 ? '#ef4444' : '#64748b');
 
     return (
@@ -535,7 +537,7 @@ function WeeklyReport({ metrics, year }) {
                 <MetricBox title="Monthly Collection" value={curr(currCol)} growth={growth.col} />
                 <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Av. Selling Price</div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'white', marginTop: '5px' }}>{curr(avSellingPrice)}</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'white', marginTop: '5px' }}>{currDecimal(avSellingPrice)}</div>
                 </div>
                 <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Av. Gross Margin</div>

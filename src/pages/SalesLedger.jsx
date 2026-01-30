@@ -82,7 +82,7 @@ const SalesLedger = () => {
 
             const profileOptions = fetchedProfiles.map(p => ({
                 id: p.id,
-                name: p.full_name || p.email,
+                name: p.initials || p.full_name || p.email,
                 isProfile: true
             }));
 
@@ -212,7 +212,7 @@ const SalesLedger = () => {
                                     <option value="">All Salesmen</option>
                                     {masterData.salesReps.map(rep => (
                                         <option key={rep.id} value={rep.name}>
-                                            {rep.initials ? `${rep.initials} - ${rep.name}` : rep.name}
+                                            {rep.name}
                                         </option>
                                     ))}
                                 </select>

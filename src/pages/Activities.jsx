@@ -356,18 +356,19 @@ export default function Activities({ embeddedAccount = null }) {
                         {activities.map((act, i) => (
                             <div key={act.id} style={{
                                 display: 'flex', gap: '15px', padding: '15px',
-                                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                borderBottom: '1px solid var(--border-color)', // Theme Border
                                 alignItems: 'flex-start'
                             }}>
                                 {/* Date Box */}
                                 <div style={{
                                     width: '60px', flexShrink: 0, textAlign: 'center',
-                                    background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '8px 5px'
+                                    background: 'var(--bg-main)', borderRadius: '8px', padding: '8px 5px', // Theme BG
+                                    border: '1px solid var(--border-color)'
                                 }}>
-                                    <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase' }}>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                                         {new Date(act.activity_date).toLocaleString('default', { month: 'short' })}
                                     </div>
-                                    <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'white' }}>
+                                    <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--text-main)' }}> {/* Theme Text */}
                                         {new Date(act.activity_date).getDate()}
                                     </div>
                                 </div>
@@ -387,7 +388,8 @@ export default function Activities({ embeddedAccount = null }) {
                                             <span style={{
                                                 display: 'flex', alignItems: 'center', gap: '5px',
                                                 fontSize: '0.85rem', padding: '2px 8px', borderRadius: '4px',
-                                                background: 'rgba(255,255,255,0.05)', color: 'white'
+                                                background: 'var(--bg-main)', color: 'var(--text-main)', // Theme badges
+                                                border: '1px solid var(--border-color)'
                                             }}>
                                                 {getTypeIcon(act.activity_type)} {act.activity_type}
                                             </span>
@@ -397,7 +399,7 @@ export default function Activities({ embeddedAccount = null }) {
                                         </div>
                                     </div>
 
-                                    <p style={{ color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '1.5', margin: 0 }}>
+                                    <p style={{ color: 'var(--text-main)', fontSize: '0.95rem', lineHeight: '1.5', margin: 0 }}> {/* readable text */}
                                         {act.outcome}
                                     </p>
                                 </div>

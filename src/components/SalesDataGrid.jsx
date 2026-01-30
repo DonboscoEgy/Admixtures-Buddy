@@ -18,10 +18,6 @@ const SalesDataGrid = ({ rowData, onSelectionChanged, onGridReady }) => {
             checkboxSelection: true,
             headerCheckboxSelection: true,
             cellStyle: { display: 'flex', alignItems: 'center', color: '#60a5fa', fontWeight: '600', cursor: 'pointer' }, // Blue Link style
-            onCellClicked: (params) => {
-                // Allow clicking the ID to edit
-                if (params.data.id) window.location.href = `/sales-ledger/edit/${params.data.id}`;
-            }
         },
         {
             field: 'transaction_date',

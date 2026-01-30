@@ -126,6 +126,8 @@ const SalesLedger = () => {
     // Handlers
     const handleEditSelected = () => {
         if (selectedRows.length !== 1) return;
+        // DEBUG: Check data integrity
+        // alert('Editing: ' + JSON.stringify(selectedRows[0])); 
         setEditingOrder(selectedRows[0]);
         setShowQuickOrder(true);
     };

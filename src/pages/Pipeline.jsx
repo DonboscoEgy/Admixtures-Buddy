@@ -201,8 +201,8 @@ function PipelineColumn({ stage, items, onItemClick }) {
 
     return (
         <div ref={setNodeRef} style={{
-            minWidth: '260px',
-            width: '260px',
+            flex: 1,
+            minWidth: '150px',
             display: 'flex',
             flexDirection: 'column',
             background: 'rgba(0,0,0,0.2)',

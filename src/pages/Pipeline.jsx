@@ -19,7 +19,7 @@ import {
     useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Plus, MapPin, Calendar, Package, Droplet, User, X } from 'lucide-react';
+import { Plus, MapPin, Calendar, Package, Droplet, User, X, Trash2 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { NumericFormat } from 'react-number-format';
 
@@ -416,21 +416,37 @@ function OpportunityModal({ onClose, onSuccess, profile, initialData }) {
 
             if (accError) throw accError;
 
-            // 3. Mark Opportunity as Won
+            // 3. Delete Opportunity (Move to Account)
             if (initialData) {
                 await supabase
                     .from('opportunities')
-                    .update({ stage: 'Won' })
+                    .delete()
                     .eq('id', initialData.id);
             }
 
-            showToast('Account Created & Opportunity Won! 🎉', 'success');
+            showToast('Account Created & Opportunity Moved! 🎉', 'success');
             onSuccess();
             // Auto-navigate
             navigate('/accounts', { state: { openAccountName: formData.account_name, openSetup: true } });
         } catch (err) {
             console.error('Conversion Failed:', err);
             showToast('Failed to convert: ' + err.message, 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!confirm('Are you sure you want to delete this opportunity?')) return;
+        setLoading(true);
+        try {
+            const { error } = await supabase.from('opportunities').delete().eq('id', initialData.id);
+            if (error) throw error;
+            showToast('Opportunity Deleted', 'success');
+            onSuccess();
+        } catch (err) {
+            console.error('Delete Error:', err);
+            showToast('Failed to delete', 'error');
         } finally {
             setLoading(false);
         }
@@ -535,19 +551,32 @@ function OpportunityModal({ onClose, onSuccess, profile, initialData }) {
                         <input type="date" name="closing_date" className="form-input" value={formData.closing_date} onChange={handleChange} required />
                     </div>
 
-                    <div className="modal-actions" style={{ justifyContent: 'space-between' }}>
-                        {initialData && formData.stage === 'Won' && (
-                            <button
-                                type="button"
-                                onClick={handleConvertToAccount}
-                                className="btn-secondary"
-                                style={{ color: '#10b981', borderColor: '#10b981' }}
-                                title="Create Account & Mark Won"
-                            >
-                                <Package size={16} style={{ marginRight: '5px' }} /> Convert to Account
-                            </button>
-                        )}
-                        <div style={{ display: 'flex', gap: '10px', marginLeft: 'auto' }}>
+                    <div className="modal-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                            {initialData && (
+                                <button
+                                    type="button"
+                                    onClick={handleDelete}
+                                    className="btn-danger"
+                                    title="Delete Opportunity"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            )}
+                            {initialData && formData.stage === 'Won' && (
+                                <button
+                                    type="button"
+                                    onClick={handleConvertToAccount}
+                                    className="btn-secondary"
+                                    style={{ color: '#10b981', borderColor: '#10b981' }}
+                                    title="Convert to Account"
+                                >
+                                    <Package size={16} style={{ marginRight: '5px' }} /> Convert
+                                </button>
+                            )}
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '10px' }}>
                             <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
                             <button type="submit" className="btn-primary" disabled={loading}>
                                 {loading ? 'Saving...' : (initialData ? 'Update Opportunity' : 'Create Opportunity')}

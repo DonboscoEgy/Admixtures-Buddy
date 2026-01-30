@@ -210,7 +210,7 @@ export default function Payments() {
                                     <input
                                         type="number"
                                         className="form-input"
-                                        style={{ paddingLeft: '40px' }}
+                                        style={{ paddingLeft: '45px' }}
                                         placeholder="0.00"
                                         value={formData.amount}
                                         onChange={e => setFormData({ ...formData, amount: e.target.value })}
@@ -225,7 +225,7 @@ export default function Payments() {
                                     <input
                                         type="date"
                                         className="form-input"
-                                        style={{ paddingLeft: '40px' }}
+                                        style={{ paddingLeft: '45px' }}
                                         value={formData.payment_date}
                                         onChange={e => setFormData({ ...formData, payment_date: e.target.value })}
                                     />

@@ -199,10 +199,12 @@ body {
   height: 42px;
   /* Fixed height for alignment */
   padding: 0.6rem 1rem;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--card-bg);
+  /* Use theme variable */
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  color: white;
+  color: var(--text-main);
+  /* Use theme variable */
   font-size: 0.9rem;
   transition: all 0.2s;
   box-sizing: border-box;
@@ -211,7 +213,7 @@ body {
 .form-input:focus {
   outline: none;
   border-color: var(--primary);
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--card-bg);
   box-shadow: 0 0 0 2px var(--primary-glow);
 }
 
@@ -230,10 +232,8 @@ body {
   font-weight: 700;
   color: var(--text-main);
   margin: 0;
-  background: linear-gradient(to right, #fff, #94a3b8);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  /* Only apply gradient in dark mode via specific selector if needed, or just use solid color */
+  /* background: linear-gradient(to right, #fff, #94a3b8); Removed problematic gradient */
 }
 
 .breadcrumb {

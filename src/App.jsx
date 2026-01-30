@@ -11,6 +11,7 @@ import Accounts from './pages/Accounts';
 import Products from './pages/Products';
 import Payments from './pages/Payments';
 import Pipeline from './pages/Pipeline';
+import Dashboard from './pages/Dashboard'; // New
 
 // Auth Pages
 import LandingPage from './pages/LandingPage';
@@ -39,9 +40,8 @@ function App() {
             <Route element={<AuthGuard />}>
               <Route element={<Layout />}>
                 {/* Redirect root of internal layout to dashboard */}
-                <Route path="/dashboard" element={<SalesLedger />} />
-
-                <Route path="/sales-ledger" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/sales-ledger" element={<SalesLedger />} />
                 <Route path="/sales-ledger/edit/:id" element={<EditOrder />} />
 
                 <Route path="/quick-order" element={<QuickOrder />} />

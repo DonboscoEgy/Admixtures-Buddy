@@ -722,6 +722,11 @@ function AccountDetailsDashboard({ account, onEdit }) {
                     </button>
                 </div>
             </div>
+
+            {/* ACTIVITY LOG SECTION (New) */}
+            <div className="glass-card" style={{ padding: '30px', marginTop: '30px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <Activities embeddedAccount={account} />
+            </div>
         </div >
     );
 }

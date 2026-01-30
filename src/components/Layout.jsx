@@ -149,13 +149,14 @@ export default function Layout() {
             <aside className="desktop-sidebar" style={{
                 width: '80px',
                 height: '100vh',
-                backgroundColor: 'rgba(11, 15, 25, 0.4)',
+                backgroundColor: 'var(--sidebar-bg)', // Dynamic Theme Color
                 borderRight: '1px solid var(--border-color)',
                 display: 'flex', // This will be overriden by CSS for mobile
                 flexDirection: 'column',
                 alignItems: 'center',
                 padding: '20px 0',
                 backdropFilter: 'blur(10px)',
+                transition: 'background-color 0.3s ease', // Smooth transition
                 zIndex: 20
             }}>
                 {/* Brand Logo */}

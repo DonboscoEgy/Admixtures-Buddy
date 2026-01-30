@@ -50,6 +50,7 @@ export default function Pipeline() {
     const [activeId, setActiveId] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingOp, setEditingOp] = useState(null);
 
     // Sensors
     const sensors = useSensors(
@@ -73,13 +74,22 @@ export default function Pipeline() {
             setOpportunities(data || []);
         } catch (error) {
             console.error('Error fetching pipeline:', error);
-            // Suppress error if table missing (first run)
         } finally {
             setLoading(false);
         }
     };
 
-    // --- DRAG HANDLERS ---
+    // --- HANDLERS ---
+    const handleEdit = (op) => {
+        setEditingOp(op);
+        setIsModalOpen(true);
+    };
+
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        setEditingOp(null);
+    };
+
     const handleDragStart = (event) => {
         setActiveId(event.active.id);
     };
@@ -87,50 +97,32 @@ export default function Pipeline() {
     const handleDragEnd = async (event) => {
         const { active, over } = event;
         setActiveId(null);
-
         if (!over) return;
 
         const activeId = active.id;
-        const overId = over.id; // This will be a STAGE ID (container) or another TASK ID
-
-        // Find the dragged item
+        const overId = over.id;
         const activeItem = opportunities.find(Op => Op.id === activeId);
         if (!activeItem) return;
 
-        // Determine New Stage
         let newStage = null;
-
-        // 1. Dropped directly on a Column Header/Container (Stage ID)
         if (STAGES.some(s => s.id === overId)) {
             newStage = overId;
-        }
-        // 2. Dropped on another Card (Task ID) -> Take that card's stage
-        else {
+        } else {
             const overItem = opportunities.find(Op => Op.id === overId);
-            if (overItem) {
-                newStage = overItem.stage;
-            }
+            if (overItem) newStage = overItem.stage;
         }
 
         if (newStage && newStage !== activeItem.stage) {
-            // Optimistic Update
             setOpportunities(prev => prev.map(op =>
                 op.id === activeId ? { ...op, stage: newStage } : op
             ));
-
-            // Backend Update
             try {
-                const { error } = await supabase
-                    .from('opportunities')
-                    .update({ stage: newStage })
-                    .eq('id', activeId);
-
+                const { error } = await supabase.from('opportunities').update({ stage: newStage }).eq('id', activeId);
                 if (error) throw error;
-                showToast(`Moved to ${newStage}`, 'success');
             } catch (err) {
                 console.error("Move failed", err);
-                showToast('Failed to update stage: ' + err.message, 'error');
-                fetchOpportunities(); // Revert
+                showToast('Failed to update stage', 'error');
+                fetchOpportunities();
             }
         }
     };
@@ -138,7 +130,7 @@ export default function Pipeline() {
     return (
         <div style={{ height: 'calc(100vh - 100px)', display: 'flex', flexDirection: 'column' }}>
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                 <div>
                     <div className="breadcrumb">Home / Sales / Pipeline</div>
                     <h1 className="page-title">Opportunities Pipeline</h1>
@@ -148,14 +140,14 @@ export default function Pipeline() {
                 </button>
             </div>
 
-            {/* Kanban Board */}
+            {/* Kanban Board - Compact */}
             <div style={{
                 flex: 1,
                 overflowX: 'auto',
                 overflowY: 'hidden',
                 display: 'flex',
-                gap: '15px',
-                paddingBottom: '20px'
+                gap: '10px',
+                paddingBottom: '10px'
             }}>
                 <DndContext
                     sensors={sensors}
@@ -168,6 +160,7 @@ export default function Pipeline() {
                             key={stage.id}
                             stage={stage}
                             items={opportunities.filter(op => op.stage === stage.id)}
+                            onItemClick={handleEdit}
                         />
                     ))}
 
@@ -184,13 +177,14 @@ export default function Pipeline() {
 
             {/* Modal */}
             {isModalOpen && (
-                <AddOpportunityModal
-                    onClose={() => setIsModalOpen(false)}
+                <OpportunityModal
+                    onClose={handleModalClose}
                     onSuccess={() => {
                         fetchOpportunities();
-                        setIsModalOpen(false);
+                        handleModalClose();
                     }}
                     profile={profile}
+                    initialData={editingOp}
                 />
             )}
         </div>
@@ -199,45 +193,40 @@ export default function Pipeline() {
 
 // --- SUB-COMPONENTS ---
 
-function PipelineColumn({ stage, items }) {
+function PipelineColumn({ stage, items, onItemClick }) {
     const { setNodeRef } = useSortable({
         id: stage.id,
-        data: {
-            type: 'Column',
-            stageId: stage.id
-        }
+        data: { type: 'Column', stageId: stage.id }
     });
 
     return (
         <div ref={setNodeRef} style={{
-            minWidth: '300px',
-            width: '300px',
+            minWidth: '260px',
+            width: '260px',
             display: 'flex',
             flexDirection: 'column',
             background: 'rgba(0,0,0,0.2)',
             borderRadius: '12px',
-            border: `1px solid ${stage.color}30`
+            border: `1px solid ${stage.color}20`
         }}>
-            {/* Column Header */}
             <div style={{
-                padding: '15px',
+                padding: '12px',
                 borderBottom: '1px solid rgba(255,255,255,0.05)',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: stage.color }}></div>
-                    <span style={{ fontWeight: 600, color: 'white' }}>{stage.label}</span>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: stage.color }}></div>
+                    <span style={{ fontWeight: 600, color: 'white', fontSize: '0.9rem' }}>{stage.label}</span>
                 </div>
-                <span style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: '10px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                <span style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '8px', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                     {items.length}
                 </span>
             </div>
 
-            {/* Drop Zone / List */}
-            <div style={{ flex: 1, padding: '10px', overflowY: 'auto' }}>
+            <div style={{ flex: 1, padding: '8px', overflowY: 'auto' }}>
                 <SortableContext items={items.map(op => op.id)} strategy={verticalListSortingStrategy}>
                     {items.map(op => (
-                        <SortableCard key={op.id} op={op} />
+                        <SortableCard key={op.id} op={op} onClick={() => onItemClick(op)} />
                     ))}
                 </SortableContext>
             </div>
@@ -245,16 +234,8 @@ function PipelineColumn({ stage, items }) {
     );
 }
 
-function SortableCard({ op }) {
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging
-    } = useSortable({ id: op.id });
-
+function SortableCard({ op, onClick }) {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: op.id });
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
@@ -262,7 +243,7 @@ function SortableCard({ op }) {
     };
 
     return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners} onDoubleClick={onClick}>
             <OpportunityCard op={op} />
         </div>
     );
@@ -271,36 +252,37 @@ function SortableCard({ op }) {
 function OpportunityCard({ op, isOverlay }) {
     if (!op) return null;
     return (
-        <div className="glass-card" style={{
-            padding: '15px',
-            marginBottom: '10px',
-            cursor: 'grab',
-            border: '1px solid rgba(255,255,255,0.08)',
-            backgroundColor: '#1e293b', // Force visible bg
-            boxShadow: isOverlay ? '0 10px 20px rgba(0,0,0,0.5)' : 'none'
-        }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'white', marginBottom: '8px' }}>{op.account_name}</h3>
+        <div
+            className="glass-card opp-card-hover"
+            style={{
+                padding: '12px',
+                marginBottom: '8px',
+                cursor: 'grab',
+                border: '1px solid rgba(255,255,255,0.05)',
+                backgroundColor: '#1e293b',
+                boxShadow: isOverlay ? '0 10px 20px rgba(0,0,0,0.5)' : 'none',
+                transition: 'all 0.2s ease',
+            }}
+        >
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'white', marginBottom: '6px' }}>{op.account_name}</h3>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    <MapPin size={14} color="#60a5fa" />
-                    {op.location || 'No Location'}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    <MapPin size={12} color="#60a5fa" />
+                    {op.location || '-'}
                 </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    <Droplet size={14} color="#f59e0b" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    <Droplet size={12} color="#f59e0b" />
                     {op.expected_volume_liters ? `${Number(op.expected_volume_liters).toLocaleString()} L` : '-'}
                 </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    <Calendar size={14} color="#10b981" />
-                    {op.closing_date || 'No Date'}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    <Calendar size={12} color="#10b981" />
+                    {op.closing_date || '-'}
                 </div>
             </div>
-
             {op.category && (
-                <div style={{ marginTop: '10px' }}>
-                    <span className="badge" style={{ background: 'rgba(255,255,255,0.1)', color: '#cbd5e1' }}>
+                <div style={{ marginTop: '8px' }}>
+                    <span className="badge" style={{ background: 'rgba(255,255,255,0.05)', color: '#94a3b8', fontSize: '0.7rem' }}>
                         {op.category}
                     </span>
                 </div>
@@ -309,12 +291,12 @@ function OpportunityCard({ op, isOverlay }) {
     );
 }
 
-function AddOpportunityModal({ onClose, onSuccess, profile }) {
+function OpportunityModal({ onClose, onSuccess, profile, initialData }) {
     const { showToast } = useToast();
     const [loading, setLoading] = useState(false);
     const [accounts, setAccounts] = useState([]);
 
-    // Form State
+    // Default State
     const [formData, setFormData] = useState({
         account_name: '',
         location: '',
@@ -327,13 +309,26 @@ function AddOpportunityModal({ onClose, onSuccess, profile }) {
     });
 
     useEffect(() => {
-        // Fetch accounts for dropdown
+        if (initialData) {
+            setFormData({
+                account_name: initialData.account_name || '',
+                location: initialData.location || '',
+                category: initialData.category || 'Readymix',
+                monthly_production_m3: initialData.monthly_production_m3 || '',
+                monthly_consumption_liters: initialData.monthly_consumption_liters || '',
+                expected_volume_liters: initialData.expected_volume_liters || '',
+                closing_date: initialData.closing_date || '',
+                stage: initialData.stage || 'Prospect'
+            });
+        }
+
+        // Fetch accounts
         const fetchAcc = async () => {
             const { data } = await supabase.from('accounts_master').select('name');
             setAccounts(data || []);
         }
         fetchAcc();
-    }, []);
+    }, [initialData]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -349,20 +344,30 @@ function AddOpportunityModal({ onClose, onSuccess, profile }) {
 
         const payload = {
             ...formData,
-            sales_rep: profile?.initials || profile?.email || 'Unknown' // Auto-assign rep
+            sales_rep: profile?.initials || profile?.email || 'Unknown'
         };
 
         try {
-            const { error } = await supabase
-                .from('opportunities')
-                .insert([payload]);
-
-            if (error) throw error;
-            showToast('Opportunity Created Successfully', 'success');
+            if (initialData) {
+                // UPDATE
+                const { error } = await supabase
+                    .from('opportunities')
+                    .update(payload)
+                    .eq('id', initialData.id);
+                if (error) throw error;
+                showToast('Opportunity Updated', 'success');
+            } else {
+                // INSERT
+                const { error } = await supabase
+                    .from('opportunities')
+                    .insert([payload]);
+                if (error) throw error;
+                showToast('Opportunity Created', 'success');
+            }
             onSuccess();
         } catch (err) {
-            console.error('Create Op Error:', err);
-            showToast('Failed to create opportunity: ' + err.message + ' (Check Console)', 'error');
+            console.error('Save Op Error:', err);
+            showToast('Failed to save: ' + err.message, 'error');
         } finally {
             setLoading(false);
         }
@@ -372,7 +377,7 @@ function AddOpportunityModal({ onClose, onSuccess, profile }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={e => e.stopPropagation()} style={{ overflowY: 'auto', maxHeight: '90vh' }}>
                 <div className="modal-header">
-                    <h2>New Opportunity</h2>
+                    <h2>{initialData ? 'Edit Opportunity' : 'New Opportunity'}</h2>
                     <button onClick={onClose} className="close-btn"><X /></button>
                 </div>
 
@@ -470,7 +475,7 @@ function AddOpportunityModal({ onClose, onSuccess, profile }) {
                     <div className="modal-actions">
                         <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
                         <button type="submit" className="btn-primary" disabled={loading}>
-                            {loading ? 'Creating...' : 'Create Opportunity'}
+                            {loading ? 'Saving...' : (initialData ? 'Update Opportunity' : 'Create Opportunity')}
                         </button>
                     </div>
 

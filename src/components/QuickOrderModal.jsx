@@ -413,9 +413,9 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
                                 color: '#374151'
                             }}
                         >
-                            <p style={{ margin: '0 0 10px 0' }}>Dear <b>Sales Coordinator</b>,</p>
-                            <p style={{ margin: '0 0 10px 0' }}>Good day.</p>
-                            <p style={{ margin: '0 0 10px 0' }}>Please find below the new Sales Order details for <b>{account || '[Account Name]'}</b>:</p>
+                            <p style={{ margin: '0 0 10px 0' }}>Dear <b>Anfal</b>,</p>
+                            <p style={{ margin: '0 0 10px 0' }}>Good day to you.</p>
+                            <p style={{ margin: '0 0 10px 0' }}>Kindly prepare a sales order for <b>{account || '[Account Name]'}</b> as follows</p>
 
                             <ul style={{ margin: '10px 0', paddingLeft: '20px' }}>
                                 {items.filter(i => i.product && i.qty).length > 0 ? (

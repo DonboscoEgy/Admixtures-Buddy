@@ -44,6 +44,63 @@ export default function Layout() {
         fetchNotifications(); // Refresh
     };
 
+    const checkUpcomingActivities = async () => {
+        const today = new Date().toISOString().split('T')[0];
+        // Get date for tomorrow
+        const tmr = new Date();
+        tmr.setDate(tmr.getDate() + 1);
+        const tomorrow = tmr.toISOString().split('T')[0];
+
+        // 1. Fetch my upcoming activities (Today or Tomorrow)
+        const myIdentifier = profile?.initials || user?.email;
+        if (!myIdentifier) return;
+
+        const { data: activities } = await supabase
+            .from('mac_account_activities')
+            .select(`
+                *,
+                accounts_master (name),
+                opportunities (account_name)
+            `)
+            .or(`activity_date.eq.${today},activity_date.eq.${tomorrow}`)
+            .eq('created_by', myIdentifier);
+
+        if (!activities || activities.length === 0) return;
+
+        // 2. Check existing notifications to avoid duplicates (dedupe by link)
+        const { data: existingNotifs } = await supabase
+            .from('notifications')
+            .select('link')
+            .gt('created_at', new Date(Date.now() - 86400000 * 2).toISOString()); // Last 2 days
+
+        const existingLinks = new Set(existingNotifs?.map(n => n.link) || []);
+
+        const newNotifs = [];
+
+        for (const act of activities) {
+            const targetName = act.accounts_master?.name || act.opportunities?.account_name || 'Unknown';
+            const uniqueLink = `/activities?focus=${act.id}`;
+
+            if (existingLinks.has(uniqueLink)) continue;
+
+            // Determine relative time text
+            const timeText = act.activity_date === today ? 'TODAY' : 'TOMORROW';
+
+            newNotifs.push({
+                title: `Upcoming ${act.activity_type}`,
+                message: `You have a ${act.activity_type} with ${targetName} ${timeText}.`,
+                type: 'info',
+                link: uniqueLink,
+                recipient_initials: myIdentifier
+            });
+        }
+
+        if (newNotifs.length > 0) {
+            await supabase.from('notifications').insert(newNotifs);
+            fetchNotifications();
+        }
+    };
+
     const checkFinancialHealth = async () => {
         // 1. Check Credit Limits
         // We fetch accounts where credit_limit > 0

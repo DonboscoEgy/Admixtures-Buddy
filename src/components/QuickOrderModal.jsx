@@ -25,7 +25,7 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
 
     const [status, setStatus] = useState({ type: '', message: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [sendEmail, setSendEmail] = useState(true); // Default ON
+    const [showEmailPreview, setShowEmailPreview] = useState(false);
 
     // Master Data
     const [masterData, setMasterData] = useState({ accounts: [], products: [] });
@@ -144,20 +144,7 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
 
             setStatus({ type: 'success', message: `Successfully added ${validItems.length} orders!` });
 
-            // 🚀 Trigger Email Notification (Edge Function)
-            try {
-                const { error: funcError } = await supabase.functions.invoke('send-order-email', {
-                    body: {
-                        customerName: account,
-                        items: validItems.map(i => ({ product: i.product, qty: i.qty })),
-                        sendEmail: sendEmail // Pass the user preference
-                    }
-                });
-                if (funcError) console.error('Email trigger failed:', funcError);
-                else console.log('Email trigger sent successfully');
-            } catch (err) {
-                console.warn('Failed to invoke email function:', err);
-            }
+            // Email automation removed by user request (IT Block). Manual Copy button added instead.
 
             // Trigger success callback
             setTimeout(() => {

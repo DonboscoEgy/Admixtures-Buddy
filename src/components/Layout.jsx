@@ -3,9 +3,10 @@ import { NavLink, Outlet } from 'react-router-dom';
 import {
     LayoutDashboard, FileText, Zap, Settings, Bell, Search, Menu, LogOut, Users,
     DollarSign, ShieldCheck, X, RefreshCw, Package, PieChart, KanbanSquare,
-    ScrollText, CreditCard, PlusCircle, Briefcase, Calendar
+    ScrollText, CreditCard, PlusCircle, Briefcase, Calendar, Sun, Moon
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import CompleteProfileModal from './CompleteProfileModal';
 
 import NotificationDropdown from './NotificationDropdown';
@@ -13,6 +14,7 @@ import { supabase } from '../supabaseClient'; // Ensure supabase import
 
 export default function Layout() {
     const { user, profile, startLogout, signOut, isAdmin, syncProfile } = useAuth();
+    const { theme, toggleTheme } = useTheme();
     const [showProfile, setShowProfile] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -259,6 +261,24 @@ export default function Layout() {
                                 </>
                             )}
                         </div>
+
+                        {/* Theme Toggle */}
+                        <button
+                            onClick={toggleTheme}
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '8px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                borderRadius: '50%',
+                                transition: 'background 0.2s'
+                            }}
+                            className="nav-btn-hover"
+                            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                        >
+                            {theme === 'dark' ? <Sun size={20} color="var(--text-main)" /> : <Moon size={20} color="var(--text-main)" />}
+                        </button>
 
                         {/* Profile Section - Clickable */}
                         <div

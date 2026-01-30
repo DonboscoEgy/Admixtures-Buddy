@@ -6,9 +6,11 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Products() {
     const { isAdmin } = useAuth();
+    const { theme } = useTheme();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -183,15 +185,29 @@ export default function Products() {
                 },
                 onCellClicked: (params) => isAdmin && handleOpenModal(params.data)
             },
-            { field: 'name', headerName: 'Product Name', flex: 2, filter: true, sortable: true, cellStyle: { color: '#e2e8f0', fontWeight: '500' } },
-            { field: 'product_family', headerName: 'Family', flex: 1.5, filter: true, sortable: true, cellStyle: { color: '#94a3b8' } },
+            {
+                field: 'name',
+                headerName: 'Product Name',
+                flex: 2,
+                filter: true,
+                sortable: true,
+                cellStyle: { color: theme === 'dark' ? '#e2e8f0' : '#1e293b', fontWeight: '500' }
+            },
+            {
+                field: 'product_family',
+                headerName: 'Family',
+                flex: 1.5,
+                filter: true,
+                sortable: true,
+                cellStyle: { color: theme === 'dark' ? '#94a3b8' : '#475569' }
+            },
             {
                 field: 'default_price',
                 headerName: 'Default Price',
                 flex: 1,
                 valueFormatter: p => p.value ? `$${Number(p.value).toFixed(2)}` : '$0.00',
                 type: 'numericColumn',
-                cellStyle: { color: '#cbd5e1' }
+                cellStyle: { color: theme === 'dark' ? '#cbd5e1' : '#334155' }
             }
         ];
 
@@ -202,12 +218,14 @@ export default function Products() {
                 flex: 1,
                 valueFormatter: p => p.value ? `$${Number(p.value).toFixed(2)}` : '$0.00',
                 type: 'numericColumn',
-                cellStyle: { color: '#cbd5e1' }
+                cellStyle: { color: theme === 'dark' ? '#cbd5e1' : '#334155' }
             });
         }
 
         return cols;
-    }, [isAdmin]);
+    }, [isAdmin, theme]);
+
+    const themeClass = theme === 'dark' ? 'ag-theme-quartz-dark' : 'ag-theme-quartz';
 
     return (
         <div className="page-container">
@@ -250,11 +268,50 @@ export default function Products() {
             </div>
 
             <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', transition: 'all 0.3s ease' }}>
-                <div className="ag-theme-quartz-dark" style={{
+                <div className={themeClass} style={{
                     flex: isModalOpen && isAdmin ? '0 0 70%' : '1 1 100%',
                     width: isModalOpen && isAdmin ? '70%' : '100%',
                     transition: 'all 0.3s ease'
                 }}>
+                    <style>
+                        {`
+                        /* Dark Mode Styles */
+                        .ag-theme-quartz-dark {
+                            --ag-selected-row-background-color: rgba(16, 185, 129, 0.2) !important;
+                            --ag-row-hover-color: rgba(255, 255, 255, 0.05) !important;
+                            --ag-checkbox-checked-color: #10b981 !important;
+                        }
+                        .ag-theme-quartz-dark .ag-row-selected {
+                            background-color: rgba(16, 185, 129, 0.2) !important;
+                            border-bottom: 1px solid rgba(16, 185, 129, 0.3) !important;
+                        }
+                        .ag-theme-quartz-dark .ag-cell {
+                            display: flex;
+                            align-items: center;
+                        }
+
+                        /* Light Mode Styles */
+                        .ag-theme-quartz {
+                            --ag-background-color: transparent !important;
+                            --ag-header-background-color: rgba(241, 245, 249, 0.5) !important;
+                            --ag-row-hover-color: rgba(16, 185, 129, 0.1) !important;
+                            --ag-selected-row-background-color: rgba(16, 185, 129, 0.15) !important;
+                            --ag-checkbox-checked-color: #10b981 !important;
+                            --ag-header-foreground-color: #475569 !important;
+                            --ag-foreground-color: #1e293b !important;
+                        }
+                        .ag-theme-quartz .ag-header {
+                            border-bottom: 1px solid #e2e8f0 !important;
+                        }
+                        .ag-theme-quartz .ag-row {
+                            border-bottom: 1px solid #f1f5f9 !important;
+                        }
+                        .ag-theme-quartz .ag-cell {
+                            display: flex;
+                            align-items: center;
+                        }
+                    `}
+                    </style>
                     <AgGridReact
                         rowData={products}
                         columnDefs={columnDefs}

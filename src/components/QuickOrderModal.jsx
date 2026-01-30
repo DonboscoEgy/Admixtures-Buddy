@@ -179,7 +179,7 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
                 <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
                     <h2 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '1.5rem', marginBottom: '0.2rem' }}>
                         <Zap size={24} fill="#eab308" color="#eab308" />
-                        {isEditMode ? 'Edit Order' : 'Quick Order'}
+                        {isEditMode ? 'Edit Order' : 'Quick Order (New)'}
                     </h2>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{isEditMode ? 'Update order details.' : 'Fast track data entry.'}</p>
 

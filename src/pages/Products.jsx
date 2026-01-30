@@ -205,9 +205,9 @@ export default function Products() {
                 field: 'default_price',
                 headerName: 'Default Price',
                 flex: 1,
-                valueFormatter: p => p.value ? `$${Number(p.value).toFixed(2)}` : '$0.00',
+                valueFormatter: p => p.value ? Number(p.value).toLocaleString('en-US', { style: 'currency', currency: 'SAR' }) : 'SAR 0.00',
                 type: 'numericColumn',
-                cellStyle: { color: theme === 'dark' ? '#cbd5e1' : '#334155' }
+                cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', color: theme === 'dark' ? '#cbd5e1' : '#334155' }
             }
         ];
 
@@ -216,9 +216,9 @@ export default function Products() {
                 field: 'cogs',
                 headerName: 'COGS',
                 flex: 1,
-                valueFormatter: p => p.value ? `$${Number(p.value).toFixed(2)}` : '$0.00',
+                valueFormatter: p => p.value ? Number(p.value).toLocaleString('en-US', { style: 'currency', currency: 'SAR' }) : 'SAR 0.00',
                 type: 'numericColumn',
-                cellStyle: { color: theme === 'dark' ? '#cbd5e1' : '#334155' }
+                cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', color: theme === 'dark' ? '#cbd5e1' : '#334155' }
             });
         }
 

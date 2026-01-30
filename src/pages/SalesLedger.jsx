@@ -19,6 +19,8 @@ const SalesLedger = () => {
         dateFrom: '',
         dateTo: ''
     });
+    // Mobile Filter Toggle State
+    const [filtersVisible, setFiltersVisible] = useState(window.innerWidth > 768);
 
     const [masterData, setMasterData] = useState({ accounts: [], products: [], salesReps: [] });
 
@@ -163,78 +165,92 @@ const SalesLedger = () => {
 
             {/* Controls */}
             <div className="card">
-                <div className="filter-grid" style={{ marginBottom: '1rem' }}>
 
-                    {/* Customer Search */}
-                    <div>
-                        <label className="form-label" style={{ color: 'var(--text-muted)' }}>Account</label>
-                        <input
-                            type="text" placeholder="Search account..." className="form-input"
-                            value={filters.customer} onChange={e => setFilters({ ...filters, customer: e.target.value })}
-                        />
-                    </div>
-
-                    {/* Product Search */}
-                    <div>
-                        <label className="form-label" style={{ color: 'var(--text-muted)' }}>Product</label>
-                        <input
-                            type="text" placeholder="Search product..." className="form-input"
-                            value={filters.product} onChange={e => setFilters({ ...filters, product: e.target.value })}
-                        />
-                    </div>
-
-                    {/* Salesman Search - Admin Only */}
-                    {isAdmin && (
-                        <div>
-                            <label className="form-label" style={{ color: 'var(--text-muted)' }}>Salesman</label>
-                            <select
-                                className="form-input"
-                                value={filters.salesman}
-                                onChange={e => setFilters({ ...filters, salesman: e.target.value })}
-                            >
-                                <option value="">All Salesmen</option>
-                                {masterData.salesReps.map(rep => (
-                                    <option key={rep.id} value={rep.name}>
-                                        {rep.initials ? `${rep.initials} - ${rep.name}` : rep.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
-
-                    {/* Date From */}
-                    <div>
-                        <label className="form-label" style={{ color: 'var(--text-muted)' }}>From Date</label>
-                        <input
-                            type="date" className="form-input"
-                            value={filters.dateFrom} onChange={e => setFilters({ ...filters, dateFrom: e.target.value })}
-                        />
-                    </div>
-
-                    {/* Date To */}
-                    <div>
-                        <label className="form-label" style={{ color: 'var(--text-muted)' }}>To Date</label>
-                        <input
-                            type="date" className="form-input"
-                            value={filters.dateTo} onChange={e => setFilters({ ...filters, dateTo: e.target.value })}
-                        />
-                    </div>
-
-                    {/* Action */}
-                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '10px' }}>
-                        <button className="btn-primary" onClick={fetchData} style={{ flex: 1 }}>
-                            Apply Filters
-                        </button>
-                        <button
-                            className="btn-secondary"
-                            onClick={() => setFilters({ customer: '', product: '', salesman: '', dateFrom: '', dateTo: '' })}
-                            style={{ width: 'auto' }}
-                            title="Reset all filters"
-                        >
-                            Reset
-                        </button>
-                    </div>
+                {/* Mobile Filter Toggle */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }} className="mobile-only-filter-btn">
+                    <button
+                        className="btn-secondary"
+                        onClick={() => setFiltersVisible(!filtersVisible)}
+                        style={{ padding: '8px 12px', fontSize: '0.9rem' }}
+                    >
+                        {filtersVisible ? 'Hide Filters' : 'Show Filters'}
+                    </button>
                 </div>
+
+                {filtersVisible && (
+                    <div className="filter-grid" style={{ marginBottom: '1rem' }}>
+
+                        {/* Customer Search */}
+                        <div>
+                            <label className="form-label" style={{ color: 'var(--text-muted)' }}>Account</label>
+                            <input
+                                type="text" placeholder="Search account..." className="form-input"
+                                value={filters.customer} onChange={e => setFilters({ ...filters, customer: e.target.value })}
+                            />
+                        </div>
+
+                        {/* Product Search */}
+                        <div>
+                            <label className="form-label" style={{ color: 'var(--text-muted)' }}>Product</label>
+                            <input
+                                type="text" placeholder="Search product..." className="form-input"
+                                value={filters.product} onChange={e => setFilters({ ...filters, product: e.target.value })}
+                            />
+                        </div>
+
+                        {/* Salesman Search - Admin Only */}
+                        {isAdmin && (
+                            <div>
+                                <label className="form-label" style={{ color: 'var(--text-muted)' }}>Salesman</label>
+                                <select
+                                    className="form-input"
+                                    value={filters.salesman}
+                                    onChange={e => setFilters({ ...filters, salesman: e.target.value })}
+                                >
+                                    <option value="">All Salesmen</option>
+                                    {masterData.salesReps.map(rep => (
+                                        <option key={rep.id} value={rep.name}>
+                                            {rep.initials ? `${rep.initials} - ${rep.name}` : rep.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        {/* Date From */}
+                        <div>
+                            <label className="form-label" style={{ color: 'var(--text-muted)' }}>From Date</label>
+                            <input
+                                type="date" className="form-input"
+                                value={filters.dateFrom} onChange={e => setFilters({ ...filters, dateFrom: e.target.value })}
+                            />
+                        </div>
+
+                        {/* Date To */}
+                        <div>
+                            <label className="form-label" style={{ color: 'var(--text-muted)' }}>To Date</label>
+                            <input
+                                type="date" className="form-input"
+                                value={filters.dateTo} onChange={e => setFilters({ ...filters, dateTo: e.target.value })}
+                            />
+                        </div>
+
+                        {/* Action */}
+                        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '10px' }}>
+                            <button className="btn-primary" onClick={fetchData} style={{ flex: 1 }}>
+                                Apply Filters
+                            </button>
+                            <button
+                                className="btn-secondary"
+                                onClick={() => setFilters({ customer: '', product: '', salesman: '', dateFrom: '', dateTo: '' })}
+                                style={{ width: 'auto' }}
+                                title="Reset all filters"
+                            >
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 <div style={{ display: 'flex', gap: '10px' }}>
                     <button onClick={() => navigate('/quick-order')} className="btn-primary" style={{ backgroundColor: '#10B981', color: 'black' }}>

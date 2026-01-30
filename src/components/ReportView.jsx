@@ -247,8 +247,9 @@ export default function ReportView() {
     return (
         <div style={{ height: '100%', overflowY: 'auto', padding: '20px', paddingBottom: '100px', background: 'var(--bg-main)', color: 'white' }}>
 
+
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '30px' }}>
+            <div className="flex-responsive-header" style={{ marginBottom: '30px' }}>
                 <div>
                     <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <Activity color="var(--primary)" size={28} /> Performance Overview
@@ -322,8 +323,9 @@ export default function ReportView() {
                 <WeeklyReport metrics={metrics} year={yearFilter} />
             ) : (
                 <>
+
                     {/* KPI GRID */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '30px' }}>
+                    <div className="grid-responsive-4" style={{ marginBottom: '30px' }}>
 
                         <KpiCard
                             title="TOTAL SALES (Inc. VAT)"
@@ -359,8 +361,9 @@ export default function ReportView() {
                         />
                     </div>
 
+
                     {/* CHARTS ROW 1 */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginBottom: '30px' }}>
+                    <div className="grid-responsive-2-1" style={{ marginBottom: '30px' }}>
 
                         {/* Monthly Trend */}
                         <div className="glass-card" style={{ padding: '20px', height: '400px' }}>
@@ -410,8 +413,9 @@ export default function ReportView() {
                         </div>
                     </div>
 
+
                     {/* CHARTS ROW 2: TOPS */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    <div className="grid-responsive-2">
 
                         {/* Top Customers */}
                         <div className="glass-card" style={{ padding: '20px', height: '350px' }}>

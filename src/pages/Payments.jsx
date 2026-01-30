@@ -146,8 +146,8 @@ export default function Payments() {
     };
 
     return (
-        <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-            <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', paddingBottom: '80px' }}>
+            <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
                     <div className="breadcrumb">Home / Payments</div>
                     <h1 className="page-title">{selectedPayment ? 'Edit Payment' : 'Record Payment'}</h1>
@@ -170,7 +170,7 @@ export default function Payments() {
                 )}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
+            <div className="grid-responsive-2">
 
                 {/* LEFT: Entry Form */}
                 <div className="glass-card" style={{ padding: '30px', border: selectedPayment ? '1px solid #3b82f6' : '1px solid var(--card-border)' }}>

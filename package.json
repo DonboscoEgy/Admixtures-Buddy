@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "build:css": "tailwindcss -i ./src/index.css -o ./dist/output.css",
+    "deploy": "git add . && git commit -m 'Quick update' && git push"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.93.2",

@@ -473,10 +473,7 @@ export default function QuickOrderModal({ onClose, onSuccess, editOrder = null }
                                 </div>
                             </div>
                         )}
-
                     </div>
         </div>
-            );
-}
             );
 }

@@ -163,7 +163,7 @@ export default function Accounts() {
                         </div>
 
                         <div style={{ marginTop: 'auto' }}>
-                            <div style={{ fontWeight: 'bold', fontSize: '1rem', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={acc.name}>
+                            <div style={{ fontWeight: 'bold', fontSize: '1rem', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={acc.name}>
                                 {acc.name}
                             </div>
                             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>
@@ -183,14 +183,14 @@ export default function Accounts() {
                     zIndex: 1000
                 }} onClick={() => setSelectedAccount(null)}>
                     <div style={{
-                        background: '#0f172a', padding: '30px', borderRadius: '16px',
+                        background: 'var(--bg-main)', padding: '30px', borderRadius: '16px', // Theme Background
                         width: '95%', maxWidth: '1200px', maxHeight: '95vh', overflowY: 'auto',
-                        border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)'
+                        border: '1px solid var(--border-color)', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)'
                     }} onClick={e => e.stopPropagation()}>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '15px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid var(--border-color)', paddingBottom: '15px' }}>
                             <div>
-                                <h2 style={{ fontSize: '1.8rem', margin: 0, color: 'white' }}>{selectedAccount.name}</h2>
+                                <h2 style={{ fontSize: '1.8rem', margin: 0, color: 'var(--text-main)' }}>{selectedAccount.name}</h2>
                                 <span style={{ color: 'var(--text-muted)' }}>
                                     Account Dashboard • Managed by {selectedAccount.created_by_initials || 'System'}
                                 </span>

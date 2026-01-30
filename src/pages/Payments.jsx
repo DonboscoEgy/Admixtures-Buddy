@@ -3,9 +3,11 @@ import { supabase } from '../supabaseClient';
 import { Save, Calendar, DollarSign, User, FileText, CheckCircle } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Payments() {
     const { user, profile } = useAuth();
+    const { theme } = useTheme();
     const { showToast } = useToast();
     const [accounts, setAccounts] = useState([]);
     const [formData, setFormData] = useState({
@@ -281,7 +283,7 @@ export default function Payments() {
                 </div>
 
                 {/* RIGHT: Recent List */}
-                <div className="glass-card" style={{ padding: '30px', background: 'rgba(0,0,0,0.2)' }}>
+                <div className="glass-card" style={{ padding: '30px', background: theme === 'dark' ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.5)', border: theme === 'dark' ? '1px solid var(--card-border)' : '1px solid #e2e8f0' }}>
                     <h3 style={{ fontSize: '1.2rem', marginBottom: '20px', color: 'var(--text-muted)' }}>Recent Payments</h3>
                     <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '15px' }}>Click on a payment to edit.</p>
 
@@ -293,9 +295,12 @@ export default function Payments() {
                                 onClick={() => handleEdit(p)}
                                 style={{
                                     padding: '15px',
-                                    background: selectedPayment?.id === p.id ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255,255,255,0.03)',
+                                    background: selectedPayment?.id === p.id
+                                        ? (theme === 'dark' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.1)')
+                                        : (theme === 'dark' ? 'rgba(255,255,255,0.03)' : 'white'),
                                     borderRadius: '8px',
                                     borderLeft: `3px solid ${selectedPayment?.id === p.id ? '#3b82f6' : '#10b981'}`,
+                                    border: selectedPayment?.id !== p.id ? (theme === 'dark' ? '1px solid transparent' : '1px solid #e2e8f0') : '',
                                     display: 'flex',
                                     justifyContent: 'space-between',
                                     alignItems: 'center',
@@ -303,7 +308,7 @@ export default function Payments() {
                                     transition: 'all 0.2s'
                                 }}>
                                 <div>
-                                    <div style={{ fontWeight: 'bold', color: 'white' }}>{p.account_name}</div>
+                                    <div style={{ fontWeight: 'bold', color: 'var(--text-main)' }}>{p.account_name}</div>
                                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{p.payment_date} • {p.notes || 'No Ref'}</div>
                                 </div>
                                 <div style={{ fontWeight: 'bold', color: selectedPayment?.id === p.id ? '#3b82f6' : '#10b981', fontSize: '1.1rem' }}>

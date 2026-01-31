@@ -11,18 +11,33 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        console.log('AUTH DEBUG: AuthProvider Mounted');
         // 1. Get initial session
         const getSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            setUser(session?.user ?? null);
-            if (session?.user) await fetchProfile(session.user.id, session.user);
-            else setLoading(false);
+            console.log('AUTH DEBUG: Calling getSession()');
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                console.log('AUTH DEBUG: Session retrieved', session ? 'User Found' : 'No Session', error);
+
+                setUser(session?.user ?? null);
+                if (session?.user) {
+                    console.log('AUTH DEBUG: Fetching profile...');
+                    await fetchProfile(session.user.id, session.user);
+                } else {
+                    console.log('AUTH DEBUG: No user, setting loading=false');
+                    setLoading(false);
+                }
+            } catch (err) {
+                console.error('AUTH DEBUG: getSession Request Failed', err);
+                setLoading(false);
+            }
         };
 
         getSession();
 
         // 2. Listen for changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            console.log('AUTH DEBUG: Auth State Change:', event);
             setUser(session?.user ?? null);
             if (session?.user) {
                 await fetchProfile(session.user.id, session.user);

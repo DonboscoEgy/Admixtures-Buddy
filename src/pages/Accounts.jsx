@@ -8,6 +8,7 @@ import {
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import Activities from './Activities';
+import RelationshipCard from '../components/RelationshipCard';
 
 // --- MAIN PAGE COMPONENT ---
 export default function Accounts() {
@@ -502,6 +503,9 @@ function AccountDetailsDashboard({ account, onEdit }) {
                     </>
                 )}
             </div>
+
+            {/* AI Intelligence Card (New) */}
+            <RelationshipCard account={account} onRefresh={fetchDetails} />
 
             {/* KPI Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '30px' }}>

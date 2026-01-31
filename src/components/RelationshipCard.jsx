@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sparkles, RefreshCw, AlertCircle, CheckCircle, TrendingUp, Phone, Calendar } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useToast } from '../context/ToastContext';

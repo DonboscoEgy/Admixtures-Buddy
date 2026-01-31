@@ -1,14 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// CORS Headers
 const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
-    // Handle CORS
     if (req.method === "OPTIONS") {
         return new Response("ok", { headers: corsHeaders });
     }
@@ -16,117 +14,73 @@ serve(async (req) => {
     try {
         const { account_id } = await req.json();
 
-        if (!account_id) {
-            throw new Error("No account_id provided");
-        }
+        // 1. Supabase Init
+        const supabase = createClient(
+            Deno.env.get("SUPABASE_URL") ?? "",
+            Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+        );
 
-        // 1. Initialize Supabase Client
-        const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-        const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-        const supabase = createClient(supabaseUrl, supabaseKey);
+        // 2. Fetch Data
+        const { data: account } = await supabase.from("accounts_master").select("name").eq("id", account_id).single();
 
-        // 2. Fetch Account & Recent Activities
-        const { data: account, error: accError } = await supabase
-            .from("accounts_master")
-            .select("name")
-            .eq("id", account_id)
-            .single();
-
-        if (accError) throw accError;
-
-        const { data: activities, error: actError } = await supabase
+        // Get Activities
+        const { data: activities } = await supabase
             .from("mac_account_activities")
-            .select("activity_type, activity_date, outcome, created_by")
+            .select("activity_type, outcome, activity_date")
             .eq("account_id", account_id)
             .order("activity_date", { ascending: false })
             .limit(15);
 
-        if (actError) throw actError;
+        const activityLog = activities?.map(a => `${a.activity_type}: ${a.outcome}`).join("\n") || "No recent activity.";
 
-        // 3. Prepare Context for Gemini
-        const activityCount = activities?.length || 0;
-        const visits = activities?.filter(a => a.activity_type === 'Visit').length || 0;
-        const calls = activities?.filter(a => a.activity_type === 'Call').length || 0;
+        // 3. Call OpenAI (GPT-4o-mini)
+        console.log("Calling OpenAI (gpt-4o-mini)...");
+        const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+        if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is missing in Secrets!");
 
-        const activityLog = activities?.map((a) =>
-            `- [${a.activity_date}] ${a.activity_type}: ${a.outcome || "No notes"}`
-        ).join("\n");
-
-        const prompt = `
-      You are a senior Sales Strategy Analyst.
-      Analyze the relationship with client "${account.name}".
-      
-      Metric Data:
-      - Total Recent Interactions: ${activityCount}
-      - Site Visits: ${visits}
-      - Calls: ${calls}
-      
-      Recent Activity Logs (Newest First):
-      ${activityLog}
-      
-      Instructions:
-      1. Determine the Sentiment: "Positive", "Neutral", "Risk", or "Unknown".
-      2. Write a 2-sentence summary of the relationship status, referencing specific outcomes.
-      3. Suggest 1 concrete Next Step for the salesperson.
-      
-      Return JSON ONLY:
-      {
-        "sentiment": "Positive",
-        "summary": "...",
-        "next_step": "..."
-      }
-    `;
-
-        // 4. Call Google Gemini API
-        const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-        if (!GEMINI_API_KEY) {
-            throw new Error("GEMINI_API_KEY is not set");
-        }
-
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: {
-                        temperature: 0.3, // Lower for more analytical/consistent results
-                        responseMimeType: "application/json"
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${OPENAI_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: "gpt-4o-mini",
+                messages: [
+                    {
+                        role: "system",
+                        content: "You are a sales assistant. Respond in JSON only: { \"sentiment\": \"Positive\"|\"Neutral\"|\"Risk\", \"summary\": \"string\", \"next_step\": \"string\" }."
+                    },
+                    {
+                        role: "user",
+                        content: `Analyze client ${account.name}.\nActivities:\n${activityLog}`
                     }
-                }),
-            }
-        );
+                ],
+                response_format: { type: "json_object" }
+            })
+        });
 
-        const geminiData = await response.json();
+        const aiData = await response.json();
 
-        if (geminiData.error) {
-            console.error("Gemini Error:", geminiData.error);
-            throw new Error("Gemini API Error: " + geminiData.error.message);
+        if (aiData.error) {
+            console.error("OpenAI Error:", aiData.error);
+            throw new Error(`OpenAI Error: ${aiData.error.message}`);
         }
 
-        // Parse Response
-        const rawText = geminiData.candidates[0].content.parts[0].text;
-        const aiResult = JSON.parse(rawText);
+        const result = JSON.parse(aiData.choices[0].message.content);
 
-        // 5. Update Database Cache
-        const now = new Date().toISOString();
+        // 4. Update DB
         await supabase.from("accounts_master").update({
-            ai_summary: aiResult.summary,
-            ai_sentiment: aiResult.sentiment,
-            ai_next_step: aiResult.next_step,
-            ai_last_updated: now
+            ai_summary: result.summary,
+            ai_sentiment: result.sentiment,
+            ai_next_step: result.next_step,
+            ai_last_updated: new Date().toISOString()
         }).eq("id", account_id);
 
-        return new Response(JSON.stringify({ success: true, ...aiResult }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        return new Response(JSON.stringify(result), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
     } catch (error) {
-        console.error("Edge Function Error:", error);
-        return new Response(JSON.stringify({ error: error.message }), {
-            status: 500,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        console.error("Function Error:", error);
+        return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 });

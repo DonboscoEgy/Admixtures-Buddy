@@ -9,11 +9,28 @@ export default function RelationshipCard({ account, onRefresh }) {
     const { theme } = useTheme();
     const [loading, setLoading] = useState(false);
 
-    // Parse fallback if columns are null (fresh account)
-    const summary = account.ai_summary || "No analysis generated yet. Click refresh to analyze recent activities.";
-    const sentiment = account.ai_sentiment || "Unknown"; // Positive, Neutral, Risk
-    const nextStep = account.ai_next_step || "-";
-    const lastUpdated = account.ai_last_updated ? new Date(account.ai_last_updated).toLocaleString() : 'Never';
+    // Local state to support instant updates without full page reload
+    const [aiData, setAiData] = useState({
+        summary: account.ai_summary,
+        sentiment: account.ai_sentiment,
+        nextStep: account.ai_next_step,
+        lastUpdated: account.ai_last_updated
+    });
+
+    // Sync with props if they change externally
+    useEffect(() => {
+        setAiData({
+            summary: account.ai_summary,
+            sentiment: account.ai_sentiment,
+            nextStep: account.ai_next_step,
+            lastUpdated: account.ai_last_updated
+        });
+    }, [account]);
+
+    const summary = aiData.summary || "No analysis generated yet. Click refresh to analyze recent activities.";
+    const sentiment = aiData.sentiment || "Unknown";
+    const nextStep = aiData.nextStep || "-";
+    const lastUpdated = aiData.lastUpdated ? new Date(aiData.lastUpdated).toLocaleString() : 'Never';
 
     // Mock functionality for now - In Phase 2 this will call the Edge Function
     const handleRefresh = async () => {
@@ -23,6 +40,15 @@ export default function RelationshipCard({ account, onRefresh }) {
             const { data, error } = await supabase.functions.invoke('summarize-account', { body: { account_id: account.id } });
 
             if (error) throw error;
+
+            // Update local state immediately
+            setAiData({
+                summary: data.summary,
+                sentiment: data.sentiment,
+                nextStep: data.next_step, // Note snake_case from DB/API to camelCase
+                lastUpdated: new Date().toISOString()
+            });
+
             showToast('Analysis completed successfully', 'success');
             if (onRefresh) onRefresh();
         } catch (err) {

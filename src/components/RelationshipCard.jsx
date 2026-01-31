@@ -20,11 +20,10 @@ export default function RelationshipCard({ account, onRefresh }) {
         setLoading(true);
         try {
             // Call Edge Function stub
-            // const { data, error } = await supabase.functions.invoke('summarize-account', { body: { account_id: account.id } });
+            const { data, error } = await supabase.functions.invoke('summarize-account', { body: { account_id: account.id } });
 
-            // For now, satisfy the UI demo with a "Not Connected" message or simulate a delay
-            await new Promise(r => setTimeout(r, 1500));
-            showToast('Logic will be connected in Phase 2 (Edge Function)', 'info');
+            if (error) throw error;
+            showToast('Analysis completed successfully', 'success');
             if (onRefresh) onRefresh();
         } catch (err) {
             console.error(err);

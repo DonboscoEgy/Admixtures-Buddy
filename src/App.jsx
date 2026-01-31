@@ -53,7 +53,7 @@ function App() {
 
                 <Route path="/admin/users" element={<AdminUsers />} />
 
-                <Route path="/test" element={<TestPage />} />
+
               </Route>
             </Route>
 
